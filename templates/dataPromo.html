@@ -1,0 +1,317 @@
+{% extends "main_admin.html" %}
+{% block content %}
+
+<script>
+    
+
+    function tambahPromo(){
+        let judul = $("#judul").val();
+        let tb = $("#tb").val();
+        let deskripsi = $("#deskripsit").val();
+        let foto = $('#foto').prop("files")[0];
+
+        let formData = new FormData();
+
+        formData.append('judul', judul);
+        formData.append('tb', tb);
+        formData.append('deskripsi', deskripsi);
+        formData.append('foto', foto); 
+
+        $.ajax({
+            type: "POST",
+            url: "/dataPromo",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.status === "success") {
+                    $('#modalMessage').text(response.msg);
+                    $("#successModal").modal("show");
+                    $('#successModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else if (response.status === "error") {
+                    $('#modalMessageE').text(response.msg);
+                    $("#errorModal").modal("show");
+                    $('#errorModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else  {
+                    $('#modalMessageW').text(response.msg);
+                    $("#warningModal").modal("show");
+                    $('#warningModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                let errorMessage = xhr.responseJSON ? xhr.responseJSON.msg : 'Terjadi kesalahan';
+                $('#modalMessageE').text(errorMessage);
+                $("#errorModal").modal("show");
+            }
+        });
+    }
+
+
+    function editPromo(id){
+        let judul = $("#judul_"+id).val();
+        let tb = $("#tb_"+id).val();
+        let deskripsi = $("#deskripsi_"+id).val();
+        let foto = $('#foto_'+id).prop("files")[0];
+
+        let formData = new FormData();
+
+        formData.append('id', id);
+        formData.append('judul', judul);
+        formData.append('tb', tb);
+        formData.append('deskripsi', deskripsi);
+        formData.append('foto', foto); 
+
+        $.ajax({
+            type: "POST",
+            url: "/dataPromoEdit",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.status === "success") {
+                    $('#modalMessage').text(response.msg);
+                    $("#successModal").modal("show");
+                    $('#successModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else if (response.status === "error") {
+                    $('#modalMessageE').text(response.msg);
+                    $("#errorModal").modal("show");
+                    $('#errorModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else  {
+                    $('#modalMessageW').text(response.msg);
+                    $("#warningModal").modal("show");
+                    $('#warningModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                let errorMessage = xhr.responseJSON ? xhr.responseJSON.msg : 'Terjadi kesalahan';
+                $('#modalMessageE').text(errorMessage);
+                $("#errorModal").modal("show");
+            }
+        });
+    }
+
+    function hapus_promo(id) {
+            console.log("deleting", id)
+            $.ajax({
+                type: "POST",
+                url: "/hapus_promo",
+                data: {
+                    id: id
+                },
+                success: function (response) {
+                    if (response.status === "success") {
+                        $('#modalMessage').text(response.msg);
+                        $("#successModal").modal("show");
+                        $('#successModal').on('hidden.bs.modal', function () {
+                            window.location.reload();
+                        });
+                    } else if (response.status === "error") {
+                        $('#modalMessageE').text(response.msg);
+                        $("#errorModal").modal("show");
+                        $('#errorModal').on('hidden.bs.modal', function () {
+                            window.location.reload();
+                        });
+                    } else  {
+                        $('#modalMessageW').text(response.msg);
+                        $("#warningModal").modal("show");
+                        $('#warningModal').on('hidden.bs.modal', function () {
+                            window.location.reload();
+                        });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    let errorMessage = xhr.responseJSON ? xhr.responseJSON.msg : 'Terjadi kesalahan';
+                    $('#modalMessageE').text(errorMessage);
+                    $("#errorModal").modal("show");
+                }
+            });
+          }
+</script>
+
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">{{ title }}</h1>
+    </div>
+
+
+    <!-- Content Row -->
+
+    <div class="row">
+
+        <!-- Profile -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <div class="row justify-content-between">
+                        <div class="col-6">
+                            <a href="" class="btn btn-costum" data-toggle="modal" data-target="#tamabahPromoModal">
+                                <i class="fas fa-fw fa-user-plus"></i>Tambah Layanan</a>
+                        </div>
+                        <div class="col-6 d-flex justify-content-end">
+                            <!-- Topbar Search -->
+                            <form class="d-sm-inline-block form-inline ms-3 navbar-search" action="/dataPromo/searchPromo" method="GET">
+                                <div class="input-group">
+                                    <input type="text" class="form-control border-0 small" name="query"
+                                        placeholder="Cari Layanan..." aria-label="Search" aria-describedby="basic-addon2" value="{{ query }}">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-costum" type="submit">
+                                            <i class="fas fa-search fa-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>                            
+                        </div>
+                    </div>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    {% if data_count > 0 %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>no</th>
+                                        <th>Judul</th>
+                                        <th>Tanggal Berakhir</th>
+                                        <th>Deskripsi</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for dt in data %}
+                                        <tr>
+                                            <td class="col-1">{{ loop.index }}</td>
+                                            <td class="col-2">{{ dt.judul }}</td>
+                                            <td class="col-2">{{ dt.tanggal_berakhir | format_date }}</td>
+                                            <td>{{ dt.deskripsi | limit_taxt(20) | safe }}</td>
+                                            <td class="col-2">
+                                                <a href="/acara_admin/show/" class="btn btn-primary mb-1"
+                                                    title="Lihat Detail"><i class="fas fa-fw fa-eye"></i> Detail</a>
+                                                <a href="#" class="btn btn-warning mb-1"
+                                                    title="Edit" data-toggle="modal" data-target="#editPromoModal{{ dt._id }}"><i class="fas fa-fw fa-pen"></i> Edit</a>
+                                                <a href="#" class="btn btn-danger mb-1"
+                                                    title="Edit" data-toggle="modal" data-target="#hapusPromoModal{{ dt._id }}"><i class="fas fa-fw fa-trash"></i> Hapus</a>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="editPromoModal{{ dt._id }}" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                              <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="fw-bold">Edit Promo</h5>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="form-group">
+                                                        <label for="judul" class="form-label">Judul</label>
+                                                        <input type="text" class="form-control form-control-user" name="judul" id="judul_{{ dt._id }}"
+                                                            placeholder="Forty Seven Laundry" value="{{ dt.judul }}" required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="tb" class="form-label">Tanggal Berakhir</label>
+                                                        <input type="date" class="form-control form-control-user" name="tb" id="tb_{{ dt._id }}"
+                                                            placeholder="Rp 12.000" value="{{ dt.tanggal_berakhir }}" required>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="deskripsi" class="form-label">Deskripsi</label>
+                                                        <input type="hidden" class="form-control form-control-user" name="deskripsi" id="deskripsi_{{ dt._id }}"
+                                                            placeholder="Forty Seven Laundry" value="{{ dt.deskripsi }}" required>
+                                                            <trix-editor input="deskripsi_{{ dt._id }}"></trix-editor>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="foto" class="form-label">Foto</label>
+                                                        <input type="file" class="form-control form-control-user" name="foto" id="foto_{{ dt._id }}">
+                                                    </div>
+                                                    <button type="submit" class="btn btn-costum" onclick="editPromo('{{ dt._id }}')" data-dismiss="modal">
+                                                        Edit
+                                                    </button>
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                </div>
+                                              </div>
+                                            </div>
+                                        </div>
+
+
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="hapusPromoModal{{ dt._id }}" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                              <div class="modal-content">
+                                                <div class="modal-body row">
+                                                    <div class="col-12 d-flex justify-content-center">
+                                                        <dotlottie-player src="https://lottie.host/d280ef46-6a47-403b-b396-807cf4579b95/fEmrI0fi9R.json" background="transparent" speed="1" style="width: 200px; height: 200px" direction="1" playMode="normal" loop autoplay></dotlottie-player>
+                                                    </div>
+                                                    <div class="col text-center">
+                                                        <p id="modalMessageE">Apakah anda yakin ingin hapus data {{ dt.judul }} ini?</p>
+                                                        <button type="submit" class="btn btn-danger" onclick="hapus_promo('{{ dt._id }}')" data-dismiss="modal">
+                                                            Hapus
+                                                        </button>
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <h4>Belum Ada data</h4>
+                    {% endif %}
+                </div>
+            </div>
+
+    </div>
+
+<!-- Modal -->
+<div class="modal fade" id="tamabahPromoModal" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="fw-bold">Tambah Promo</h5>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="judul" class="form-label">Judul</label>
+                <input type="text" class="form-control form-control-user" name="judul" id="judul"
+                    placeholder="Promo 12.12" required>
+            </div>
+            <div class="form-group">
+                <label for="tb" class="form-label">Tanggal Berakhir</label>
+                <input type="date" class="form-control form-control-user" name="tb" id="tb"
+                    placeholder="Rp 12.000" required>
+            </div>
+            <div class="form-group">
+                <label for="deskripsi" class="form-label">Deskripsi</label>
+                <input type="hidden" class="form-control form-control-user" name="deskripsi" id="deskripsit"
+                    placeholder="Forty Seven Laundry" required>
+                    <trix-editor input="deskripsit"></trix-editor>
+            </div>
+            <div class="form-group">
+                <label for="foto" class="form-label">Foto</label>
+                <input type="file" class="form-control form-control-user" name="foto" id="foto">
+            </div>
+            <button type="submit" class="btn btn-costum" onclick="tambahPromo()" data-dismiss="modal">
+                Tambah
+            </button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+    
+{% endblock %}
+    

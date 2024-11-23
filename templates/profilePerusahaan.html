@@ -1,0 +1,205 @@
+{% extends "main_admin.html" %}
+{% block content %}
+
+<script>
+    function tambahprofile(){
+        let namaPerusahaan = $("#namaPerusahaan").val();
+        let deskripsi = $("#deskripsi").val();
+        let visi = $("#visi").val();
+        let misi = $("#misi").val();
+        let logo = $('#logo').prop("files")[0];
+
+        let formData = new FormData();
+
+        formData.append('namaPerusahaan', namaPerusahaan);
+        formData.append('deskripsi', deskripsi);
+        formData.append('visi', visi);
+        formData.append('misi', misi);
+        formData.append('logo', logo); 
+
+        $.ajax({
+            type: "POST",
+            url: "/profilePerusahaan",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.status === "success") {
+                    $('#modalMessage').text(response.msg);
+                    $("#successModal").modal("show");
+                    $('#successModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else if (response.status === "error") {
+                    $('#modalMessageE').text(response.msg);
+                    $("#errorModal").modal("show");
+                    $('#errorModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else  {
+                    $('#modalMessageW').text(response.msg);
+                    $("#warningModal").modal("show");
+                    $('#warningModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                let errorMessage = xhr.responseJSON ? xhr.responseJSON.msg : 'Terjadi kesalahan';
+                $('#modalMessageE').text(errorMessage);
+                $("#errorModal").modal("show");
+            }
+        });
+    }
+
+
+    function editProfileP(id){
+        let namaPerusahaan = $("#namaPerusahaan").val();
+        let deskripsi = $("#deskripsi").val();
+        let visi = $("#visi").val();
+        let misi = $("#misi").val();
+        let logo = $('#logo').prop("files")[0];
+
+        let formData = new FormData();
+
+        formData.append('id', id);
+        formData.append('namaPerusahaan', namaPerusahaan);
+        formData.append('deskripsi', deskripsi);
+        formData.append('visi', visi);
+        formData.append('misi', misi);
+        formData.append('logo', logo); 
+
+        $.ajax({
+            type: "POST",
+            url: "/profilePerusahaanEdit",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.status === "success") {
+                    $('#modalMessage').text(response.msg);
+                    $("#successModal").modal("show");
+                    $('#successModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else if (response.status === "error") {
+                    $('#modalMessageE').text(response.msg);
+                    $("#errorModal").modal("show");
+                    $('#errorModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else  {
+                    $('#modalMessageW').text(response.msg);
+                    $("#warningModal").modal("show");
+                    $('#warningModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                let errorMessage = xhr.responseJSON ? xhr.responseJSON.msg : 'Terjadi kesalahan';
+                $('#modalMessageE').text(errorMessage);
+                $("#errorModal").modal("show");
+            }
+        });
+    }
+</script>
+
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">{{ title }}</h1>
+    </div>
+
+
+    <!-- Content Row -->
+
+    <div class="row">
+
+        <!-- Profile -->
+            <div class="card shadow mb-4">
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 col-sm-4 mb-3">
+                            {% if data.logo %}
+                            <img class="img-fluid rounded-circle " src="{{ url_for('static', filename='img/logo/' + data.logo) }}">
+                            {% else %}
+                            <img class="img-fluid rounded-circle " src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
+                            {% endif %}
+                        </div>
+                        <div class="col-12 col-sm-8">
+                            {% if data %}
+                                <div class="form-group">
+                                    <label for="username" class="form-label">Nama Perusahaan</label>
+                                    <input type="text" class="form-control form-control-user" name="username" id="namaPerusahaan"
+                                        placeholder="Forty Seven Laundry" value="{{ data.namaPerusahaan }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="deskripsi" class="form-label">Deskripsi</label>
+                                    <input type="hidden" class="form-control form-control-user" id="deskripsi" name="deskripsi"
+                                    placeholder="deskripsi" value="{{ data.deskripsi }}">
+                                    <trix-editor input="deskripsi"></trix-editor>
+                                </div>
+                                <div class="form-group">
+                                    <label for="visi" class="form-label">Visi</label>
+                                    <input type="hidden" class="form-control form-control-user" id="visi" name="visi"
+                                    placeholder="visi" value="{{ data.visi }}">
+                                    <trix-editor input="visi"></trix-editor>
+                                </div>
+                                <div class="form-group">
+                                    <label for="misi" class="form-label">Misi</label>
+                                    <input type="hidden" class="form-control form-control-user" id="misi" name="misi"
+                                    placeholder="misi" value="{{ data.misi }}">
+                                    <trix-editor input="misi"></trix-editor>
+                                </div>
+                                <div class="form-group">
+                                    <label for="misi" class="form-label">Logo Perusahaan</label>
+                                    <input type="file" class="form-control form-control-user" name="logo" id="logo">
+                                </div>
+                                <button type="submit" class="btn btn-costum w-100" onclick="editProfileP('{{ data._id }}')" >
+                                    Edit
+                                </button>
+                            {% else %}
+                                <div class="form-group">
+                                    <label for="namaPerusahaan" class="form-label">Nama Perusahaan</label>
+                                    <input type="text" class="form-control form-control-user" name="namaPerusahaan" id="namaPerusahaan"
+                                        placeholder="Forty Seven Laundry" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="deskripsi" class="form-label">Deskripsi</label>
+                                    <input type="hidden" class="form-control form-control-user" id="deskripsi" name="deskripsi"
+                                    placeholder="deskripsi">
+                                    <trix-editor input="deskripsi"></trix-editor>
+                                </div>
+                                <div class="form-group">
+                                    <label for="visi" class="form-label">Visi</label>
+                                    <input type="hidden" class="form-control form-control-user" id="visi" name="visi"
+                                    placeholder="visi">
+                                    <trix-editor input="visi"></trix-editor>
+                                </div>
+                                <div class="form-group">
+                                    <label for="misi" class="form-label">Misi</label>
+                                    <input type="hidden" class="form-control form-control-user" id="misi" name="misi"
+                                    placeholder="misi">
+                                    <trix-editor input="misi"></trix-editor>
+                                </div>
+                                <div class="form-group">
+                                    <label for="logo" class="form-label">Logo Perusahaan</label>
+                                    <input type="file" class="form-control form-control-user" name="logo" id="logo">
+                                </div>
+                                <button type="submit" class="btn btn-costum w-100" onclick="tambahprofile()" >
+                                    Edit
+                                </button>
+                            {% endif %}
+                        
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    </div>
+
+    
+{% endblock %}
+    

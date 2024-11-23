@@ -1,0 +1,284 @@
+{% extends "main_admin.html" %}
+{% block title %}Dashboard{% endblock %} 
+{% block content %}
+
+<script>
+    function editprofile(id) {
+        let username = $("#nama").val();
+        let kelamin = $("input[name='flexRadioDefault']:checked").val(); // Perbaikan pengambilan radio button
+        let tgl_lahir = $("#tgl_lahir").val();
+        let alamat = $("#alamat").val();
+        let no_telepon = $("#no_telepon").val();
+        let foto_profil = $('#foto_profil').prop("files")[0];
+
+
+        let formData = new FormData();
+
+        formData.append('id', id);
+        formData.append('username', username);
+        formData.append('kelamin', kelamin);
+        formData.append('tgl_lahir', tgl_lahir);
+        formData.append('alamat', alamat);
+        formData.append('no_telepon', no_telepon);
+        formData.append('foto_profil', foto_profil); 
+
+        $.ajax({
+            type: "POST",
+            url: "/editprofile",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.status === "success") {
+                    $('#modalMessage').text(response.msg);
+                    $("#successModal").modal("show");
+                    $('#successModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else if (response.status === "error") {
+                    $('#modalMessageE').text(response.msg);
+                    $("#errorModal").modal("show");
+                    $('#errorModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else  {
+                    $('#modalMessageW').text(response.msg);
+                    $("#warningModal").modal("show");
+                    $('#warningModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                let errorMessage = xhr.responseJSON ? xhr.responseJSON.msg : 'Terjadi kesalahan';
+                $('#modalMessageE').text(errorMessage);
+                $("#errorModal").modal("show");
+            }
+        });
+    }
+
+    function change_password(id){
+        let current_password = $("#current_password").val();
+        let new_password = $("#new_password").val();
+        let new_password_confirmation = $("#new_password_confirmation").val();
+
+        $.ajax({
+            type: "POST",
+            url: "/change_password",
+            data: {
+                id:id,
+                current_password:current_password,
+                new_password:new_password,
+                new_password_confirmation:new_password_confirmation
+            },
+            success: function (response) {
+                if (response.status === "success") {
+                    $('#modalMessage').text(response.msg);
+                    $("#successModal").modal("show");
+                    $('#successModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else if (response.status === "error") {
+                    $('#modalMessageE').text(response.msg);
+                    $("#errorModal").modal("show");
+                    $('#errorModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else  {
+                    $('#modalMessageW').text(response.msg);
+                    $("#warningModal").modal("show");
+                    $('#warningModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                }
+            },
+            error: function (xhr) {
+                let errorMessage = xhr.responseJSON ? xhr.responseJSON.msg : 'Terjadi kesalahan';
+                $('#modalMessageE').text(errorMessage);
+                $("#errorModal").modal("show");
+            }
+        });
+    }
+</script>
+
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+    </div>
+
+    <!-- Content Row -->
+    <div class="row">
+
+        <!-- Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-costum shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-costum text-uppercase mb-1">
+                                Profile Perusahaan</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-building fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-costum shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-costum text-uppercase mb-1">
+                                Data Contact</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-address-book fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-costum shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-costum text-uppercase mb-1">
+                                Data Layanan</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tshirt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Card Example -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-costum shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-costum text-uppercase mb-1">
+                                Data Promo</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-percentage fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Row -->
+
+    <div class="row">
+
+        <!-- Profile -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-costum">Profile</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 col-sm-4 mb-3">
+                            {% if user.foto_profil %}
+                            <img class="img-fluid rounded-circle " src="{{ url_for('static', filename='img/profile/' + user.foto_profil) }}">
+                            {% else %}
+                            <img class="img-fluid rounded-circle " src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
+                            {% endif %}
+                        </div>
+                        <div class="col-12 col-sm-8">
+                                <div class="form-group">
+                                    <input type="text" class="form-control form-control-user" name="username" id="nama"
+                                        placeholder="Ujang jamaludin" value="{{ user.username }}" required>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <div class="row ms-2">
+                                        <div class="col-12 col-sm-4">
+                                            <input class="form-check-input custom-checkbox" type="radio" name="flexRadioDefault"
+                                                id="flexRadioDefault1" value="Laki-laki" 
+                                                {% if user.kelamin == 'Laki-laki' or user.kelamin == 'laki-laki' %}checked{% endif %}>
+                                            <label class="form-check-label" for="flexRadioDefault1">
+                                                Laki-laki
+                                            </label>
+                                        </div>
+                                        <div class="col">
+                                            <input class="form-check-input custom-checkbox" type="radio" name="flexRadioDefault"
+                                                id="flexRadioDefault2" value="Perempuan" 
+                                                {% if user.kelamin == 'Perempuan' or user.kelamin == 'perempuan' %}checked{% endif %}>
+                                            <label class="form-check-label" for="flexRadioDefault2">
+                                                Perempuan
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <input type="date" class="form-control form-control-user" name="tgl_lahir" id="tgl_lahir"
+                                        value="{{ user.tgl_lahir }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control form-control-user" name="alamat" id="alamat"
+                                        placeholder="Alamat lengkap" value="{{ user.alamat }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" class="form-control form-control-user" name="no_telepon" id="no_telepon"
+                                        placeholder="089993899389" value="{{ user.tlp }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="file" class="form-control form-control-user" name="foto_profil" id="foto_profil">
+                                </div>
+                                <button type="submit" class="btn btn-costum" onclick="editprofile('{{ user._id }}')" >
+                                    Edit
+                                </button>
+                            
+                        
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ganti password -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-costum">Ganti Password</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="form-group">
+                        <input type="password" class="form-control " id="current_password"
+                            name="current_password" placeholder="Masukan password lama" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control " id="new_password" name="new_password"
+                            placeholder="Masukan password baru" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control " id="new_password_confirmation"
+                            name="new_password_confirmation" placeholder="Konfirmasi password baru" required>
+                    </div>
+                    <button type="submit" class="btn btn-costum" onclick="change_password('{{ user._id }}')">Ganti password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+{% endblock %}
+    

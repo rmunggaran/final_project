@@ -1,0 +1,312 @@
+{% extends "main_admin.html" %}
+{% block content %}
+
+<script>
+    function tambahContact(){
+        let nomor = $("#nomor").val();
+        let email = $("#email").val();
+        let alamat = $("#alamat").val();
+        let hariBukaDari = $("#hariBukaDari").val();
+        let hariBukaSampai = $("#hariBukaSampai").val();
+        let jamBukaDari = $("#jamBukaDari").val();
+        let jamBukaSampai = $("#jamBukaSampai").val();
+        let tt = $("#tt").val();
+        let ig = $("#ig").val();
+        let maps = $("#maps").val();
+
+        let formData = new FormData();
+
+        formData.append('nomor', nomor);
+        formData.append('email', email);
+        formData.append('alamat', alamat);
+        formData.append('hariBukaDari', hariBukaDari);
+        formData.append('hariBukaSampai', hariBukaSampai); 
+        formData.append('jamBukaDari', jamBukaDari); 
+        formData.append('jamBukaSampai', jamBukaSampai); 
+        formData.append('tt', tt); 
+        formData.append('ig', ig); 
+        formData.append('maps', maps); 
+
+        $.ajax({
+            type: "POST",
+            url: "/dataContact",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.status === "success") {
+                    $('#modalMessage').text(response.msg);
+                    $("#successModal").modal("show");
+                    $('#successModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else if (response.status === "error") {
+                    $('#modalMessageE').text(response.msg);
+                    $("#errorModal").modal("show");
+                    $('#errorModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else  {
+                    $('#modalMessageW').text(response.msg);
+                    $("#warningModal").modal("show");
+                    $('#warningModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                let errorMessage = xhr.responseJSON ? xhr.responseJSON.msg : 'Terjadi kesalahan';
+                $('#modalMessageE').text(errorMessage);
+                $("#errorModal").modal("show");
+            }
+        });
+    }
+
+
+    function editContact(id){
+        let nomor = $("#nomor").val();
+        let email = $("#email").val();
+        let alamat = $("#alamat").val();
+        let hariBukaDari = $("#hariBukaDari").val();
+        let hariBukaSampai = $("#hariBukaSampai").val();
+        let jamBukaDari = $("#jamBukaDari").val();
+        let jamBukaSampai = $("#jamBukaSampai").val();
+        let tt = $("#tt").val();
+        let ig = $("#ig").val();
+        let maps = $("#maps").val();
+
+        let formData = new FormData();
+
+        formData.append('id', id);
+        formData.append('nomor', nomor);
+        formData.append('email', email);
+        formData.append('alamat', alamat);
+        formData.append('hariBukaDari', hariBukaDari);
+        formData.append('hariBukaSampai', hariBukaSampai); 
+        formData.append('jamBukaDari', jamBukaDari); 
+        formData.append('jamBukaSampai', jamBukaSampai); 
+        formData.append('tt', tt); 
+        formData.append('ig', ig); 
+        formData.append('maps', maps); 
+
+        $.ajax({
+            type: "POST",
+            url: "/dataContactEdit",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.status === "success") {
+                    $('#modalMessage').text(response.msg);
+                    $("#successModal").modal("show");
+                    $('#successModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else if (response.status === "error") {
+                    $('#modalMessageE').text(response.msg);
+                    $("#errorModal").modal("show");
+                    $('#errorModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else  {
+                    $('#modalMessageW').text(response.msg);
+                    $("#warningModal").modal("show");
+                    $('#warningModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                let errorMessage = xhr.responseJSON ? xhr.responseJSON.msg : 'Terjadi kesalahan';
+                $('#modalMessageE').text(errorMessage);
+                $("#errorModal").modal("show");
+            }
+        });
+    }
+</script>
+
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">{{ title }}</h1>
+    </div>
+
+
+    <!-- Content Row -->
+
+    <div class="row">
+
+        <!-- Profile -->
+            <div class="card shadow mb-4">
+                <!-- Card Body -->
+                <div class="card-body">
+                    {% if data %}
+                        <div class="form-group">
+                            <label for="nomor" class="form-label">Nomor telepone/whatsApp</label>
+                            <input type="number" class="form-control form-control-user" name="nomor" id="nomor"
+                                placeholder="0893293829" value="{{ data.nomor }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email Perusahaan</label>
+                            <input type="text" class="form-control form-control-user" name="email" id="email"
+                                placeholder="anu@gmail.com" value="{{ data.email }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="alamat" class="form-label">Alamat Perusahaan</label>
+                            <input type="text" class="form-control form-control-user" name="alamat" id="alamat"
+                                placeholder="Forty Seven Laundry" value="{{ data.alamat }}" required>
+                        </div>
+                        <div class="row form-group">
+                            <label for="alamat" class="form-label">Hari Buka</label>
+                            <div class="col-6">
+                                <select class="form-select" aria-label="Default select example" id="hariBukaDari">
+                                    <option {% if not data.hari_buka.dari %} selected {% endif %}>Pilih hari</option>
+                                    <option value="senin" {% if data.hari_buka.dari == "senin" %} selected {% endif %}>Senin</option>
+                                    <option value="selasa" {% if data.hari_buka.dari == "selasa" %} selected {% endif %}>Selasa</option>
+                                    <option value="rabu" {% if data.hari_buka.dari == "rabu" %} selected {% endif %}>Rabu</option>
+                                    <option value="kamis" {% if data.hari_buka.dari == "kamis" %} selected {% endif %}>Kamis</option>
+                                    <option value="jumat" {% if data.hari_buka.dari == "jumat" %} selected {% endif %}>Jumat</option>
+                                    <option value="sabtu" {% if data.hari_buka.dari == "sabtu" %} selected {% endif %}>Sabtu</option>
+                                    <option value="minggu" {% if data.hari_buka.dari == "minggu" %} selected {% endif %}>Minggu</option>
+                                  </select>
+                            </div>
+                            <div class="col text-center">-</div>
+                            <div class="col-5">
+                                <select class="form-select" aria-label="Default select example" id="hariBukaSampai">
+                                    <option {% if not data.hari_buka.sampai %} selected {% endif %}>Pilih hari</option>
+                                    <option value="senin" {% if data.hari_buka.sampai == "senin" %} selected {% endif %}>Senin</option>
+                                    <option value="selasa" {% if data.hari_buka.sampai == "selasa" %} selected {% endif %}>Selasa</option>
+                                    <option value="rabu" {% if data.hari_buka.sampai == "rabu" %} selected {% endif %}>Rabu</option>
+                                    <option value="kamis" {% if data.hari_buka.sampai == "kamis" %} selected {% endif %}>Kamis</option>
+                                    <option value="jumat" {% if data.hari_buka.sampai == "jumat" %} selected {% endif %}>Jumat</option>
+                                    <option value="sabtu" {% if data.hari_buka.sampai == "sabtu" %} selected {% endif %}>Sabtu</option>
+                                    <option value="minggu" {% if data.hari_buka.sampai == "minggu" %} selected {% endif %}>Minggu</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label for="alamat" class="form-label">Jam Buka</label>
+                            <div class="col-6">
+                                <input type="time" class="form-control form-control-user" name="jamBukaDari" id="jamBukaDari"
+                                    required value="{{ data.jam_buka.dari }}">
+                            </div>
+                            <div class="col text-center">-</div>
+                            <div class="col-5">
+                                <input type="time" class="form-control form-control-user" name="jamBukaSampai" id="jamBukaSampai"
+                                    required value="{{ data.jam_buka.sampai }}">
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-6">
+                                <label for="tt" class="form-label">Link Tiktok</label>
+                                <input type="text" class="form-control form-control-user" name="tt" id="tt"
+                                    placeholder="https://www.tiktok.com/" required value="{{ data.social_media.tiktok }}">
+                            </div>
+                            <div class="col-6">
+                                <label for="ig" class="form-label">Link Instagram</label>
+                                <input type="text" class="form-control form-control-user" name="ig" id="ig"
+                                    placeholder="https://www.instagram.com/" required value="{{ data.social_media.instagram }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="maps" class="form-label">Link maps</label>
+                            <input type="text" class="form-control form-control-user" name="maps" id="maps"
+                                placeholder="skaks" required value="{{ data.maps }}">
+                        </div>
+                        <div class="form-group">
+                            <div class="map-container" style="width: 100%; height: 300px;">
+                                {{ data.maps | safe }}
+                            </div>
+                            
+                        </div>
+
+                        <button type="submit" class="btn btn-costum w-100" onclick="editContact('{{ data._id }}')" >
+                            Edit
+                        </button>
+                    {% else %}
+                        <div class="form-group">
+                            <label for="nomor" class="form-label">Nomor telepone/whatsApp</label>
+                            <input type="number" class="form-control form-control-user" name="nomor" id="nomor"
+                                placeholder="Forty Seven Laundry" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email Perusahaan</label>
+                            <input type="text" class="form-control form-control-user" name="email" id="email"
+                                placeholder="Forty Seven Laundry" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="alamat" class="form-label">Alamat Perusahaan</label>
+                            <input type="text" class="form-control form-control-user" name="alamat" id="alamat"
+                                placeholder="Forty Seven Laundry" required>
+                        </div>
+                        <div class="row form-group">
+                            <label for="alamat" class="form-label">Hari Buka</label>
+                            <div class="col-6">
+                                <select class="form-select" aria-label="Default select example" id="hariBukaDari">
+                                    <option selected>Pilih hari</option>
+                                    <option value="senin">Senin</option>
+                                    <option value="selasa">Selasa</option>
+                                    <option value="rabu">Rabu</option>
+                                    <option value="kamis">Kamis</option>
+                                    <option value="jumat">Jumat</option>
+                                    <option value="sabtu">Sabtu</option>
+                                    <option value="minggu">Minggu</option>
+                                  </select>
+                            </div>
+                            <div class="col text-center">-</div>
+                            <div class="col-5">
+                                <select class="form-select" aria-label="Default select example" id="hariBukaSampai">
+                                    <option selected>Pilih hari</option>
+                                    <option value="senin">Senin</option>
+                                    <option value="selasa">Selasa</option>
+                                    <option value="rabu">Rabu</option>
+                                    <option value="kamis">Kamis</option>
+                                    <option value="jumat">Jumat</option>
+                                    <option value="sabtu">Sabtu</option>
+                                    <option value="minggu">Minggu</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <label for="alamat" class="form-label">Jam Buka</label>
+                            <div class="col-6">
+                                <input type="time" class="form-control form-control-user" name="jamBukaDari" id="jamBukaDari"
+                                    required>
+                            </div>
+                            <div class="col text-center">-</div>
+                            <div class="col-5">
+                                <input type="time" class="form-control form-control-user" name="jamBukaSampai" id="jamBukaSampai"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-6">
+                                <label for="tt" class="form-label">Link Tiktok</label>
+                                <input type="text" class="form-control form-control-user" name="tt" id="tt"
+                                    placeholder="https://www.tiktok.com/" required>
+                            </div>
+                            <div class="col-6">
+                                <label for="ig" class="form-label">Link Instagram</label>
+                                <input type="text" class="form-control form-control-user" name="ig" id="ig"
+                                    placeholder="https://www.instagram.com/" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="maps" class="form-label">Link maps</label>
+                            <input type="text" class="form-control form-control-user" name="maps" id="maps"
+                                placeholder="skaks" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-costum w-100" onclick="tambahContact()" >
+                            Edit
+                        </button>
+                    {% endif %}
+                        
+                </div>
+            </div>
+
+    </div>
+
+    
+{% endblock %}
+    
