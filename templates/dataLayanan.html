@@ -10,6 +10,12 @@
         let deskripsi = $("#deskripsit").val();
         let foto = $('#foto').prop("files")[0];
 
+        if (!judul || !harga || !deskripsi || !foto) {
+            $('#modalMessageW').text('Data yang anda masukkan belum lengkap. Harap isi semua bidang yang diperlukan.');
+            $("#warningModal").modal("show");
+            return; 
+        }
+
         let formData = new FormData();
 
         formData.append('judul', judul);
