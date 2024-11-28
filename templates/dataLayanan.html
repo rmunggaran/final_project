@@ -7,10 +7,12 @@
     function tambahLayanan(){
         let judul = $("#judul").val();
         let harga = $("#harga").val();
+        let kategori = $("#kategori").val();
+        let wp = $("#wp").val();
         let deskripsi = $("#deskripsit").val();
         let foto = $('#foto').prop("files")[0];
 
-        if (!judul || !harga || !deskripsi || !foto) {
+        if (!judul || !harga || !deskripsi || !foto || !kategori || !wp) {
             $('#modalMessageW').text('Data yang anda masukkan belum lengkap. Harap isi semua bidang yang diperlukan.');
             $("#warningModal").modal("show");
             return; 
@@ -20,6 +22,8 @@
 
         formData.append('judul', judul);
         formData.append('harga', harga);
+        formData.append('kategori', kategori);
+        formData.append('wp', wp);
         formData.append('deskripsi', deskripsi);
         formData.append('foto', foto); 
 
@@ -62,6 +66,8 @@
     function editLayana(id){
         let judul = $("#judul_"+id).val();
         let harga = $("#harga_"+id).val();
+        let kategori = $("#kategori_"+id).val();
+        let wp = $("#wp_"+id).val();
         let deskripsi = $("#deskripsi_"+id).val();
         let foto = $('#foto_'+id).prop("files")[0];
 
@@ -70,6 +76,8 @@
         formData.append('id', id);
         formData.append('judul', judul);
         formData.append('harga', harga);
+        formData.append('kategori', kategori);
+        formData.append('wp', wp);
         formData.append('deskripsi', deskripsi);
         formData.append('foto', foto); 
 
@@ -146,6 +154,29 @@
           }
 </script>
 
+<style>
+    .pagination {
+        background-color: #f8f9fa;
+    }
+    .pagination .page-item.active .page-link {
+        background-color: #f9d71c;
+        border-color: #f9d71c;
+        color: white;
+    }
+    .pagination .page-link:hover {
+        background-color: #e6c100;
+        border-color: #e6c100;
+    }
+    .pagination .page-link {
+        color: #f9d71c;
+        border: 1px solid #f9d71c;
+    }
+    .pagination .page-item.disabled .page-link {
+        color: #f9d71c;
+        background-color: #e9ecef;
+        border-color: #f9d71c;
+    }
+</style>
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -203,7 +234,7 @@
                                             <td class="col-2">Rp {{ dt.harga | format_rupiah }}/kg</td>
                                             <td>{{ dt.deskripsi | limit_taxt(20) | safe }}</td>
                                             <td class="col-2">
-                                                <a href="/acara_admin/show/" class="btn btn-primary mb-1"
+                                                <a href="/layanan" class="btn btn-primary mb-1"
                                                     title="Lihat Detail"><i class="fas fa-fw fa-eye"></i> Detail</a>
                                                 <a href="#" class="btn btn-warning mb-1"
                                                     title="Edit" data-toggle="modal" data-target="#editLayananModal{{ dt._id }}"><i class="fas fa-fw fa-pen"></i> Edit</a>
@@ -229,6 +260,22 @@
                                                         <label for="harga" class="form-label">Harga</label>
                                                         <input type="text" class="form-control form-control-user" name="harga" id="harga_{{ dt._id }}"
                                                             placeholder="Forty Seven Laundry" value="{{ dt.harga }}" required>
+                                                    </div>
+                                                    <div class="row form-group">
+                                                        <div class="col-6">
+                                                            <label for="alamat" class="form-label">Kategori</label>
+                                                            <select class="form-select" aria-label="Default select example" id="kategori_{{ dt._id }}">
+                                                                <option {% if not dt.kategori %}selected{% endif %}>Pilih Kategori</option>
+                                                                <option value="ck" {% if dt.kategori=="ck" %}selected{% endif %}>Cuci komplit</option>
+                                                                <option value="setrika" {% if dt.kategori=="setrika" %}selected{% endif %}>Setrika</option>
+                                                                <option value="cl" {% if dt.kategori=="cl" %}selected{% endif %}>Cuci lipat</option>
+                                                              </select>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label for="wp" class="form-label">Wakru Pengerjaan</label>
+                                                            <input type="text" class="form-control form-control-user" name="wp" id="wp_{{ dt._id }}"
+                                                                placeholder="2 jam" value="{{ dt.wp }}" required>
+                                                        </div>
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="deskripsi" class="form-label">Deskripsi</label>
@@ -272,6 +319,9 @@
                                     {% endfor %}
                                 </tbody>
                             </table>
+                            <div class="d-flex justify-content-center">
+                                {{ pagination.links }}
+                            </div>
                         </div>
                     {% else %}
                         <h4>Belum Ada data</h4>
@@ -299,6 +349,23 @@
                 <input type="number" class="form-control form-control-user" name="harga" id="harga"
                     placeholder="Rp 12.000" required>
             </div>
+            <div class="row form-group">
+                <div class="col-6">
+                    <label for="alamat" class="form-label">Kategori</label>
+                    <select class="form-select" aria-label="Default select example" id="kategori">
+                        <option selected>Pilih Kategori</option>
+                        <option value="ck">Cuci komplit</option>
+                        <option value="setrika">Setrika</option>
+                        <option value="cl">Cuci lipat</option>
+                      </select>
+                </div>
+                <div class="col-6">
+                    <label for="wp" class="form-label">Wakru Pengerjaan</label>
+                    <input type="text" class="form-control form-control-user" name="wp" id="wp"
+                        placeholder="2 jam" required>
+                </div>
+            </div>
+            
             <div class="form-group">
                 <label for="deskripsi" class="form-label">Deskripsi</label>
                 <input type="hidden" class="form-control form-control-user" name="deskripsi" id="deskripsit"

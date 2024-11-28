@@ -1,6 +1,442 @@
 {% extends "main.html" %}
-{% block title %}Home Page{% endblock %} 
+{% block title %}Home - Forty Seven Laundry{% endblock %} 
+{% block header %}
+<h1 class="header-title">FORTY SEVEN LAUNDRY PKU</h1>
+<a href="{% if contact.nomor %}https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan{% else %}#{% endif %}" class="btn btn-secondary" target="_blank">Order Sekarang</a>
+{% endblock %}
 {% block content %}
-    <h1>coba</h1>
+
+<style>
+  .container .btn {
+    background-color: #f9d71c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+  }
+  
+  .container .btn:hover {
+    background-color: #e6c100;
+  }
+  .modal .btn {
+    background-color: #f9d71c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+  }
+
+  .modal .btn:hover {
+    background-color: #e6c100;
+  }
+
+  .bg-custum{
+    background-color: #f9d71c;
+  }
+  
+</style>
+
+<script>
+  function tambahrating(id){
+        let name = $("#name").val();
+        let review = $("#review").val();
+        let rating = $("#rating").val();
+
+        let formData = new FormData();
+
+        formData.append('id_user', id);
+        formData.append('name', name);
+        formData.append('review', review);
+        formData.append('rating', rating);
+
+        $.ajax({
+            type: "POST",
+            url: "/tambahrating",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.status === "success") {
+                    $('#modalMessage').text(response.msg);
+                    $("#successModal").modal("show");
+                    $('#successModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else if (response.status === "error") {
+                    $('#modalMessageE').text(response.msg);
+                    $("#errorModal").modal("show");
+                    $('#errorModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else  {
+                    $('#modalMessageW').text(response.msg);
+                    $("#warningModal").modal("show");
+                    $('#warningModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                let errorMessage = xhr.responseJSON ? xhr.responseJSON.msg : 'Terjadi kesalahan';
+                $('#modalMessageE').text(errorMessage);
+                $("#errorModal").modal("show");
+            }
+        });
+    }
+
+  function editrating(id){
+        let name = $("#name").val();
+        let review = $("#review").val();
+        let rating = $("#rating").val();
+
+        let formData = new FormData();
+
+        formData.append('id', id);
+        formData.append('name', name);
+        formData.append('review', review);
+        formData.append('rating', rating);
+
+        $.ajax({
+            type: "POST",
+            url: "/editrating",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.status === "success") {
+                    $('#modalMessage').text(response.msg);
+                    $("#successModal").modal("show");
+                    $('#successModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else if (response.status === "error") {
+                    $('#modalMessageE').text(response.msg);
+                    $("#errorModal").modal("show");
+                    $('#errorModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                } else  {
+                    $('#modalMessageW').text(response.msg);
+                    $("#warningModal").modal("show");
+                    $('#warningModal').on('hidden.bs.modal', function () {
+                        window.location.reload();
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                let errorMessage = xhr.responseJSON ? xhr.responseJSON.msg : 'Terjadi kesalahan';
+                $('#modalMessageE').text(errorMessage);
+                $("#errorModal").modal("show");
+            }
+        });
+    }
+</script>
+
+    <!-- INTRO -->
+    <section id="about">
+        <div class="container d-flex align-items-center mt-5">
+            <div class="row">
+                <div class="col-12 col-sm-6 d-flex justify-content-center">
+                    {% if profile.logo %}
+                    <img class="img-fluid" src="{{ url_for('static', filename='img/logo/' + profile.logo) }}">
+                    {% else %}
+                    <img class="img-fluid" src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
+                    {% endif %}
+                </div>
+                <div class="intro-content ms-4 col d-flex align-items-center">
+                    <div>
+                    {% if profile %}
+                        <h2>{{ profile.namaPerusahaan }}</h2>
+                        <p>
+                            {{ profile.deskripsi | safe }}
+                        </p>
+                        {% if contact.nomor %}
+                            <a href="https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan" class="btn btn-secondary">Pesan Sekarang</a>
+                        {% else %}
+                            <a href="https://wa.me/6282173515200?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan" class="btn btn-secondary">Pesan Sekarang</a>
+                        {% endif %}
+                    {% else %}
+                        <h2>Tidak ada data</h2>
+                        <p>
+                          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Beatae, ipsum officiis harum quisquam repellendus doloribus voluptatibus distinctio ut molestiae unde error libero facilis minima dolores fuga quidem aperiam dolorum enim. Inventore rerum, deleniti velit accusantium facilis delectus tenetur voluptas unde quam perspiciatis dolorem voluptate numquam id odit eum repudiandae explicabo?
+                        </p>
+                        <a href="https://wa.me/6282173515200?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan" class="btn btn-secondary">Pesan Sekarang</a>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+      </section>
+  
+      <!-- PROMO -->
+      <section id="promo">
+        <div class="container">
+          <h2>Promo</h2>
+          <div class="row">
+            {% for pro in promo %}
+            <div class="col-md-4">
+              <div class="card">
+                {% if pro.foto %}
+                <img class="card-img-to" src="{{ url_for('static', filename='img/promo/' + pro.foto) }}">
+                {% else %}
+                <img class="card-img-to" src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
+                {% endif %}
+                <div class="card-body">
+                    <h4 class="text-center">{{ pro.judul }}</h4>
+                    <p class="text-center" style="color: #fbce19;">Berlaku sampai : {{ pro.tanggal_berakhir | format_date }}</p>
+                    <p>{{ pro.deskripsi | safe }}</p>
+                    <div class="text-center">
+                        {% if contact.nomor %}
+                            <a href="https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan" class="btn btn-secondary text">Pesan Sekarang</a>
+                        {% else %}
+                            <a href="https://wa.me/6282173515200?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan" class="btn btn-secondary">Pesan Sekarang</a>
+                        {% endif %}
+                    </div>
+                    
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+  
+      <div class="separator">
+        <div class="container">
+          <div class="separator-content">
+            <h2 class="text-center">💯 Pilihan Tepat untuk Laundry Anda 💯</h2>
+          </div>
+        </div>
+      </div>
+  
+      <!-- LAYANAN -->
+      <section id="services">
+        <h2>Layanan Laundry Forty Seven</h2>
+        <div class="service-items">
+          <img src="/static/img/asset/sprei.jpg" alt="Sprei" />
+          <img src="/static/img/asset/boneka.jpg" alt="Boneka" />
+          <img src="/static/img/asset/handuk.jpg" alt="Handuk" />
+          <img src="/static/img/asset/sarungbantal.jpg" alt="Sarung Bantal" />
+          <img src="/static/img/asset/tas.jpg" alt="Tas" />
+          <img src="/static/img/asset/hordeng.jpg" alt="Tas" />
+          <img src="/static/img/asset/sepatu.jpg" alt="Tas" />
+          <img src="/static/img/asset/stroller.jpg" alt="Tas" />
+        </div>
+      </section>
+  
+      <!-- MENGAPA HARUS KAMI -->
+      <section id="why-us">
+        <div class="container text-center">
+          <h2>Mengapa Harus Kami?</h2>
+          <div class="row">
+            <div class="col-md-3">
+              <img src="/static/img/asset/badge.png" alt="Kualitas Terbaik" class="why-icon" />
+              <h5>Kualitas Terbaik</h5>
+              <p>Kami menggunakan deterjen dan pelembut ramah lingkungan serta mesin cuci berkualitas tinggi untuk menjaga warna dan tekstur pakaian Anda.</p>
+            </div>
+            <div class="col-md-3">
+              <img src="/static/img/asset/quick.png" alt="Pengerjaan Cepat" class="why-icon" />
+              <h5>Pengerjaan Cepat</h5>
+              <p>Layanan kami dirancang untuk memenuhi kebutuhan Anda tepat waktu, sehingga Anda tak perlu menunggu lama.</p>
+            </div>
+            <div class="col-md-3">
+              <img src="/static/img/asset/delivery-truck.png" alt="Layanan Antar Jemput" class="why-icon" />
+              <h5>Layanan Antar Jemput</h5>
+              <p>Kami menyediakan layanan antar-jemput laundry untuk memudahkan Anda, sehingga Anda cukup memesan dan kami akan mengurus sisanya.</p>
+            </div>
+            <div class="col-md-3">
+              <img src="/static/img/asset/expertise.png" alt="Tenaga Kerja Profesional" class="why-icon" />
+              <h5>Tenaga Kerja Profesional</h5>
+              <p>Dengan tim berpengalaman dan terlatih, kami memastikan pakaian Anda mendapat perawatan terbaik.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+  
+      <!-- TESTIMONI -->
+      <section id="testimonials" class="py-5 bg-custum">
+        <div class="container-fluid">
+          <h2 class="text-center mb-4">Apa Kata Mereka?</h2>
+          <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              <!-- Slide pertama -->
+              <div class="carousel-item active">
+                <div class="d-flex justify-content-center">
+                  {% for rating in rating_data1 %}
+                  <div class="card mx-2 shadow-sm" style="max-width: 300px;">
+                    <div class="card-body text-center">
+                      <div class="profile-circle mb-3">
+                        <img
+                          src="/static/img/asset/profile2.png"
+                          alt="Rifqi Aini"
+                          class="rounded-circle"
+                          width="80"
+                          height="80"
+                        />
+                      </div>
+                      <p>"{{ rating['review'] }}"</p>
+                      <div class="rating mb-2">
+                        {% if rating['rating'] == "5" %}
+                        ⭐⭐⭐⭐⭐
+                        {% elif rating['rating'] == "4" %}
+                        ⭐⭐⭐⭐
+                        {% elif rating['rating'] == "3" %}
+                        ⭐⭐⭐
+                        {% elif rating['rating'] == "2" %}
+                        ⭐⭐
+                        {% elif rating['rating'] == "1" %}
+                        ⭐
+                        {% endif %}
+                      </div>
+                      <strong>{{ rating['name'] }}</strong>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+              <!-- Slide kedua (tambahkan lebih banyak card jika perlu) -->
+              <div class="carousel-item">
+                <div class="d-flex justify-content-center">
+                  <!-- Card Testimoni 4 -->
+                  {% for rating in rating_data2 %}
+                  <div class="card mx-2 shadow-sm" style="max-width: 300px;">
+                    <div class="card-body text-center">
+                      <div class="profile-circle mb-3">
+                        <img
+                          src="/static/img/asset/profile.png"
+                          alt="User Testimoni 4"
+                          class="rounded-circle"
+                          width="80"
+                          height="80"
+                        />
+                      </div>
+                      <p>"{{ rating['review'] }}"</p>
+                      <div class="rating mb-2">
+                        {% if rating['rating'] == "5" %}
+                        ⭐⭐⭐⭐⭐
+                        {% elif rating['rating'] == "4" %}
+                        ⭐⭐⭐⭐
+                        {% elif rating['rating'] == "3" %}
+                        ⭐⭐⭐
+                        {% elif rating['rating'] == "2" %}
+                        ⭐⭐
+                        {% elif rating['rating'] == "1" %}
+                        ⭐
+                        {% endif %}
+                      </div>
+                      <strong>{{ rating['name'] }}</strong>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          
+            <!-- Tombol Navigasi Carousel -->
+            <button
+              class="carousel-control-prev"
+              type="button"
+              data-bs-target="#testimonialCarousel"
+              data-bs-slide="prev"
+            >
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button
+              class="carousel-control-next"
+              type="button"
+              data-bs-target="#testimonialCarousel"
+              data-bs-slide="next"
+            >
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+
+
+{% if 'username' in session %}
+    <div class="container my-5 text-center">
+      {% if rating_status %}
+      <button type="button" class="btn btn-secondary w-100" data-bs-toggle="modal" data-bs-target="#ratingModal">
+          Edit Rating
+      </button>
+      {% else %}
+        <button type="button" class="btn btn-secondary w-100" data-bs-toggle="modal" data-bs-target="#ratingModal">
+            Berikan Rating
+        </button>
+      {% endif %}
+    </div>
+{% endif %}
+
+      <div class="modal fade" id="ratingModal" tabindex="-1" aria-labelledby="ratingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ratingModalLabel">{% if rating_status %}Edit Rating{% else %}Berikan Rating{% endif %}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                {% if rating_status %}
+                <div class="modal-body">
+                  <div class="form-group mb-3">
+                      <label for="name">Nama</label>
+                      <input type="text" class="form-control" id="name" name="name" placeholder="Masukkan nama" value="{{ rating_status.name }}" disabled required>
+                  </div>
+                  <div class="form-group mb-3">
+                      <label for="review">Review</label>
+                      <textarea class="form-control" id="review" name="review" rows="3" placeholder="Tulis ulasan Anda..." required>{{ rating_status.review }}</textarea>
+                  </div>
+                  <div class="form-group mb-3">
+                      <label for="rating">Rating</label>
+                      <select class="form-select" id="rating" name="rating" required>
+                          <option value="" {% if rating_status.rating %} selected {% endif %} disabled>Pilih Rating</option>
+                          <option value="5" {% if rating_status.rating == "5" %} selected {% endif %}>⭐⭐⭐⭐⭐ - Sangat Bagus</option>
+                          <option value="4" {% if rating_status.rating == "4" %} selected {% endif %}>⭐⭐⭐⭐ - Bagus</option>
+                          <option value="3" {% if rating_status.rating == "3" %} selected {% endif %}>⭐⭐⭐ - Cukup</option>
+                          <option value="2" {% if rating_status.rating == "2" %} selected {% endif %}>⭐⭐ - Kurang</option>
+                          <option value="1" {% if rating_status.rating == "1" %} selected {% endif %}>⭐ - Buruk</option>
+                      </select>
+                  </div>
+                  <div class="form-group text-center">
+                      <button type="submit" onclick="editrating('{{ rating_status._id }}')" class="btn btn-success w-100" data-bs-dismiss="modal">Edit</button>
+                  </div>
+                </div>
+                {% else %}
+                <div class="modal-body">
+                  <div class="form-group mb-3">
+                      <label for="name">Nama</label>
+                      <input type="text" class="form-control" id="name" name="name" placeholder="Masukkan nama" value="{{ user.name }}" disabled required>
+                  </div>
+                  <div class="form-group mb-3">
+                      <label for="review">Review</label>
+                      <textarea class="form-control" id="review" name="review" rows="3" placeholder="Tulis ulasan Anda..." required></textarea>
+                  </div>
+                  <div class="form-group mb-3">
+                      <label for="rating">Rating</label>
+                      <select class="form-select" id="rating" name="rating" required>
+                          <option value="" selected disabled>Pilih Rating</option>
+                          <option value="5">⭐⭐⭐⭐⭐ - Sangat Bagus</option>
+                          <option value="4">⭐⭐⭐⭐ - Bagus</option>
+                          <option value="3">⭐⭐⭐ - Cukup</option>
+                          <option value="2">⭐⭐ - Kurang</option>
+                          <option value="1">⭐ - Buruk</option>
+                      </select>
+                  </div>
+                  <div class="form-group text-center">
+                      <button type="submit" onclick="tambahrating('{{ user._id }}')" class="btn btn-success w-100" data-bs-dismiss="modal">Submit</button>
+                  </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 {% endblock %}
     

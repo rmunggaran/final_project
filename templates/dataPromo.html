@@ -145,6 +145,29 @@
             });
           }
 </script>
+<style>
+    .pagination {
+        background-color: #f8f9fa;
+    }
+    .pagination .page-item.active .page-link {
+        background-color: #f9d71c;
+        border-color: #f9d71c;
+        color: white;
+    }
+    .pagination .page-link:hover {
+        background-color: #e6c100;
+        border-color: #e6c100;
+    }
+    .pagination .page-link {
+        color: #f9d71c;
+        border: 1px solid #f9d71c;
+    }
+    .pagination .page-item.disabled .page-link {
+        color: #f9d71c;
+        background-color: #e9ecef;
+        border-color: #f9d71c;
+    }
+</style>
 
 
     <!-- Page Heading -->
@@ -203,7 +226,7 @@
                                             <td class="col-2">{{ dt.tanggal_berakhir | format_date }}</td>
                                             <td>{{ dt.deskripsi | limit_taxt(20) | safe }}</td>
                                             <td class="col-2">
-                                                <a href="/acara_admin/show/" class="btn btn-primary mb-1"
+                                                <a href="/promo" class="btn btn-primary mb-1"
                                                     title="Lihat Detail"><i class="fas fa-fw fa-eye"></i> Detail</a>
                                                 <a href="#" class="btn btn-warning mb-1"
                                                     title="Edit" data-toggle="modal" data-target="#editPromoModal{{ dt._id }}"><i class="fas fa-fw fa-pen"></i> Edit</a>
@@ -272,10 +295,14 @@
                                     {% endfor %}
                                 </tbody>
                             </table>
+                            <div class="d-flex justify-content-center">
+                                {{ pagination.links }}
+                            </div>
                         </div>
                     {% else %}
                         <h4>Belum Ada data</h4>
                     {% endif %}
+
                 </div>
             </div>
 

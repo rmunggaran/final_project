@@ -1,0 +1,83 @@
+{% extends "main.html" %}
+{% block title %}Promo - Forty Seven Laundry{% endblock %} 
+{% block header %}
+<h1>Promo Khusus Laundry</h1>
+<p>Manfaatkan penawaran terbatas kami untuk layanan terbaik!</p>
+{% endblock %}
+{% block content %}
+<style>
+    .pagination {
+        background-color: #f8f9fa;
+    }
+    .pagination .page-item.active .page-link {
+        background-color: #f9d71c;
+        border-color: #f9d71c;
+        color: white;
+    }
+    .pagination .page-link:hover {
+        background-color: #e6c100;
+        border-color: #e6c100;
+    }
+    .pagination .page-link {
+        color: #f9d71c;
+        border: 1px solid #f9d71c;
+    }
+    .pagination .page-item.disabled .page-link {
+        color: #f9d71c;
+        background-color: #e9ecef;
+        border-color: #f9d71c;
+    }
+</style>
+
+
+    <!-- Promo -->
+    <section class="promo-intro">
+        <div class="container">
+            <h2>Yuk cepetan cek promo spesial kami</h2>
+            <p>Semakin mudah dan hemat dengan berbagai macam promo laundry di Forty Seven Laundry Pku. Hubungi kontak
+                kami, dan ambil promonya sekarang juga!!!</p>
+            <div class="arrows">
+                <span>&#x2193;</span>
+                <span>&#x2193;</span>
+                <span>&#x2193;</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Price List -->
+    <section class="price-list mb-3">
+        <h2 class="subtitle">Promo Paket Laundry</h2>
+        <div class="container">
+            <div class="cards row">
+                {% for pro in promo %}
+                <div class="col-md-4">
+                  <div class="card">
+                    {% if pro.foto %}
+                    <img class="card-img-to" src="{{ url_for('static', filename='img/promo/' + pro.foto) }}">
+                    {% else %}
+                    <img class="card-img-to" src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h4 class="text-center">{{ pro.judul }}</h4>
+                        <p class="text-center" style="color: #fbce19;">Berlaku sampai : {{ pro.tanggal_berakhir | format_date }}</p>
+                        <p>{{ pro.deskripsi | safe }}</p>
+                        <div class="text-center">
+                            {% if contact.nomor %}
+                                <a href="https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan" class="btn btn-secondary text">Pesan Sekarang</a>
+                            {% else %}
+                                <a href="https://wa.me/6282173515200?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan" class="btn btn-secondary">Pesan Sekarang</a>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+                <div class="d-flex justify-content-center">
+                    {{ pagination.links }}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+    

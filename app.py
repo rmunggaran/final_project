@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
+from flask_paginate import Pagination
 import os
 import re
 
@@ -27,6 +28,7 @@ profile_collection = db.profile
 contact_collection = db.contact
 layanan_collection = db.layanan
 promo_collection = db.promo
+rating_collection = db.rating
 
 
 # ============== Filter ================
@@ -54,13 +56,157 @@ def format_date(value):
     except ValueError:
         return value
 
+@app.template_filter('format_phone')
+def format_phone(number):
+    number = str(number)
+    
+    number = "+62" + number 
+    
+    formatted = f"{number[:3]} {number[3:6]}-{number[6:10]}-{number[10:]}"
+    return formatted
+
 # ============== end Filter ================
 
 # ================ User ====================
 @app.route('/')
 def home():
-    return render_template('home.html')
+    user = None
+    rating_status = None
+    if 'username' in session:
+        user = users_collection.find_one({"username": session['username']})
+        user_id = user['_id']
+        rating_status = rating_collection.find_one({"id_user": str(user_id)})
+    return render_template(
+        'home.html',
+        user = user,
+        rating_status = rating_status,
+        rating_data1 = list(rating_collection.find().sort([('_id', -1)]).limit(3)),
+        rating_data2 = list(rating_collection.find().sort([('_id', -1)]).skip(3).limit(3)),
+        profile = profile_collection.find_one(),
+        contact = contact_collection.find_one(),
+        promo = promo_collection.find().sort('_id', -1).limit(3),
+        )
+
+@app.route('/promo')
+def promo():
+    user = None
+    if 'username' in session:
+        user = users_collection.find_one({"username": session['username']})
+
+    page = request.args.get('page', 1, type=int)  
+    per_page = 6
+    
+    total = promo_collection.count_documents({})
+    
+    promos = promo_collection.find().sort('_id', -1).skip((page - 1) * per_page).limit(per_page)
+    pagination = Pagination(page=page, per_page=per_page, total=total, record_name='promos')
+    return render_template(
+        'promo.html',
+        user = user,
+        profile = profile_collection.find_one(),
+        contact = contact_collection.find_one(),
+        promo = promos,
+        pagination=pagination
+        )
+
+@app.route('/layanan')
+def layanan():
+    user = None
+    if 'username' in session:
+        user = users_collection.find_one({"username": session['username']})
+    return render_template(
+        'layanan.html',
+        user = user,
+        profile = profile_collection.find_one(),
+        contact = contact_collection.find_one(),
+        promo = promo_collection.find().sort('judul', -1),
+        layanan_ck = layanan_collection.find({"kategori": "ck"}).sort('judul', -1),
+        layanan_setrika = layanan_collection.find({"kategori": "setrika"}).sort('judul', -1),
+        layanan_cl = layanan_collection.find({"kategori": "cl"}).sort('judul', -1)
+        )
+
+@app.route('/about')
+def about():
+    user = None
+    if 'username' in session:
+        user = users_collection.find_one({"username": session['username']})
+    return render_template(
+        'about.html',
+        user = user,
+        profile = profile_collection.find_one(),
+        contact = contact_collection.find_one(),
+        )
+
+@app.route('/contact')
+def contact():
+    user = None
+    if 'username' in session:
+        user = users_collection.find_one({"username": session['username']})
+    return render_template(
+        'contact.html',
+        user = user,
+        profile = profile_collection.find_one(),
+        contact = contact_collection.find_one(),
+        )
 # ================ end User ====================
+
+# ================ Rating ====================
+@app.route('/tambahrating', methods=['POST'])
+def tambahrating():
+    try :
+        id_user = request.form.get('id_user')
+        name = request.form.get('name')
+        review = request.form.get('review')
+        rating = request.form.get('rating')
+
+        rating_data = {
+            'id_user': id_user,
+            'name': name,
+            'review': review,
+            'rating': rating
+        }
+
+        result = rating_collection.insert_one(rating_data)
+        if result.inserted_id:
+            return jsonify({'status': 'success', 'msg': 'Terima kasih! Rating Anda telah berhasil disimpan.'})
+        else:
+            return jsonify({'status': 'warning', 'msg': 'Maaf, terjadi kesalahan. Rating gagal disimpan. Silakan coba lagi atau hubungi admin.'})
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'msg': f'Error: {e}'})
+    
+@app.route('/editrating', methods=['POST'])
+def editrating():
+    try :
+        rating_id = request.form.get('id')
+        rating = rating_collection.find_one({"_id": ObjectId(rating_id)})
+
+        if not rating:
+            return jsonify({'status': 'error', 'msg': f'Error: rating_id tidak ditemukan.'})
+
+        name = request.form.get('name')
+        review = request.form.get('review')
+        rating = request.form.get('rating')
+
+        rating_data = {
+            'name': name,
+            'review': review,
+            'rating': rating
+        }
+
+        result = rating_collection.update_one(
+            {"_id": ObjectId(rating_id)},
+            {"$set": rating_data}
+        )
+        if result.modified_count > 0:
+            return jsonify({'status': 'success', 'msg': 'Terima kasih! Rating Anda telah berhasil di edit.'})
+        else:
+            return jsonify({'status': 'warning', 'msg': 'Maaf, terjadi kesalahan. Rating gagal di edit. Silakan coba lagi atau hubungi admin.'})
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'msg': f'Error: {e}'})
+# ================ End Rating ====================
+
 
 # ================ Login ====================
 @app.route('/login', methods=['GET', 'POST'])
@@ -71,19 +217,60 @@ def login():
         return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
-        username = request.form['username']
+        email = request.form['email']
         password = request.form['password']
 
-        user = users_collection.find_one({"username": username})
+        user = users_collection.find_one({"email": email})
 
         if user and check_password_hash(user['password'], password):
             session['username'] = user['username']
-            return redirect(url_for('dashboard'))
+            session['role'] = user['role']
+            
+            if user['role'] == '1': 
+                return redirect(url_for('dashboard'))
+            elif user['role'] == '2':  
+                return redirect(url_for('home'))
         else:
             flash('Username atau password salah!', 'danger')
 
     return render_template('login.html')
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        try :
+            name = request.form.get('name')
+            username = request.form.get('username')
+            email = request.form.get('email')
+            alamat = request.form.get('alamat')
+            nomor = request.form.get('nomor')
+            password = request.form.get('password')
+            confirm_password = request.form.get('confirm_password')
+            role = request.form.get('role')
+
+            if password != confirm_password:
+                return jsonify({'status': 'error', 'msg': 'Passwords do not match!'})
+
+            hashed_password = generate_password_hash(password)
+
+            user_data = {
+                'name': name,
+                'username': username,
+                'email': email,
+                'alamat': alamat,
+                'nomor': nomor,
+                'password': hashed_password,
+                'role': role
+            }
+            result = users_collection.insert_one(user_data)
+            if result.inserted_id:
+                return jsonify({'status': 'success', 'msg': 'Berhasil melakukan register silah login'})
+            else:
+                return jsonify({'status': 'warning', 'msg': 'Register gagal, segera hubungi admin terkait.'})
+        except Exception as e:
+            return jsonify({'status': 'error', 'msg': f'Error: {e}'})
+    
+    return render_template('register.html')
 
 @app.route('/logout')
 def logout():
@@ -100,7 +287,7 @@ def logout():
 # ================ Dashboard Admin ====================
 @app.route('/dashboard')
 def dashboard():
-    if 'username' in session:
+    if 'username' in session and session.get('role') == '1':
         today = datetime.now()
         return render_template(
             'dashboard.html', 
@@ -108,6 +295,8 @@ def dashboard():
             user = users_collection.find_one({"username": session['username']}),
             time = today.strftime('%d %B %Y')
             )
+    elif 'username' in session and session.get('role') == '2':
+        return redirect(url_for('home'))
     else:
         flash('Harap login terlebih dahulu!', 'warning')
         return redirect(url_for('login'))
@@ -122,18 +311,18 @@ def edit_user():
         if not user:
             return jsonify({'status': 'error', 'msg': f'Error: User tidak ditemukan.'})
 
+        name = request.form.get('name')
         username = request.form.get('username')
-        kelamin = request.form.get('kelamin')
-        tgl_lahir = request.form.get('tgl_lahir')
+        email = request.form.get('email')
         alamat = request.form.get('alamat')
         no_telepon = request.form.get('no_telepon')
 
         profile = request.files.get('foto_profil')
         
         update_data = {
+            "name": name,
             "username": username,
-            "kelamin": kelamin,
-            "tgl_lahir": tgl_lahir,
+            "email": email,
             "alamat": alamat,
             "tlp": no_telepon
         }
@@ -199,7 +388,7 @@ def change_password():
 # ================ Profile perusahaan ====================
 @app.route('/profilePerusahaan', methods=['GET', 'POST'])
 def profilePerusahaan():
-    if 'username' in session:
+    if 'username' in session and session.get('role') == '1':
         if request.method == 'POST':
             try:
                 namaPerusahaan = request.form.get('namaPerusahaan')
@@ -245,6 +434,8 @@ def profilePerusahaan():
             time = today.strftime('%d %B %Y'),
             data = profile_collection.find_one(),
             )
+    elif 'username' in session and session.get('role') == '2':
+        return redirect(url_for('home'))
     else:
         flash('Harap login terlebih dahulu!', 'warning')
         return redirect(url_for('login'))
@@ -252,7 +443,7 @@ def profilePerusahaan():
 
 @app.route('/profilePerusahaanEdit', methods=['POST'])
 def profilePerusahaanEdit():
-    if 'username' in session:
+    if 'username' in session and session.get('role') == '1':
         try:
             profile_id = request.form.get('id')
             profile = profile_collection.find_one({"_id": ObjectId(profile_id)})
@@ -293,6 +484,8 @@ def profilePerusahaanEdit():
                 return jsonify({'status': 'warning', 'msg': 'Tidak ada perubahan data.'})
         except Exception as e:
             return jsonify({'status': 'error', 'msg': f'Error: {e}'})
+    elif 'username' in session and session.get('role') == '2':
+        return redirect(url_for('home'))
     else:
         flash('Harap login terlebih dahulu!', 'warning')
         return redirect(url_for('login'))
@@ -302,7 +495,7 @@ def profilePerusahaanEdit():
 # ================ Data Contact ====================
 @app.route('/dataContact', methods=['GET', 'POST'])
 def dataContact():
-    if 'username' in session:
+    if 'username' in session and session.get('role') == '1':
         if request.method == 'POST':
             try:
                 nomor = request.form.get('nomor')
@@ -355,6 +548,8 @@ def dataContact():
             time = today.strftime('%d %B %Y'),
             data = contact_collection.find_one(),
             )
+    elif 'username' in session and session.get('role') == '2':
+        return redirect(url_for('home'))
     else:
         flash('Harap login terlebih dahulu!', 'warning')
         return redirect(url_for('login'))
@@ -362,7 +557,7 @@ def dataContact():
 
 @app.route('/dataContactEdit', methods=['POST'])
 def dataContactEdit():
-    if 'username' in session:
+    if 'username' in session and session.get('role') == '1':
         try:
             contact_id = request.form.get('id')
             contact = contact_collection.find_one({"_id": ObjectId(contact_id)})
@@ -413,6 +608,8 @@ def dataContactEdit():
                 return jsonify({'status': 'warning', 'msg': 'Tidak ada perubahan data.'})
         except Exception as e:
             return jsonify({'status': 'error', 'msg': f'Error: {e}'})
+    elif 'username' in session and session.get('role') == '2':
+        return redirect(url_for('home'))
     else:
         flash('Harap login terlebih dahulu!', 'warning')
         return redirect(url_for('login'))
@@ -422,17 +619,21 @@ def dataContactEdit():
 # ========================= Data Layanan ========================
 @app.route('/dataLayanan', methods=['GET', 'POST'])
 def dataLayanan():
-    if 'username' in session:
+    if 'username' in session and session.get('role') == '1':
         if request.method == 'POST':
             try:
                 judul = request.form.get('judul')
                 harga = request.form.get('harga')
+                kategori = request.form.get('kategori')
+                wp = request.form.get('wp')
                 deskripsi = request.form.get('deskripsi')
                 foto = request.files.get('foto')
 
                 insert_data = {
                     "judul": judul,
                     "harga": harga,
+                    "kategori": kategori,
+                    "wp": wp,
                     "deskripsi": deskripsi
                 }
 
@@ -459,14 +660,27 @@ def dataLayanan():
                 return jsonify({'status': 'error', 'msg': f'Error: {e}'})
 
         today = datetime.now()
+
+        page = request.args.get('page', 1, type=int)  
+        per_page = 5  
+        
+        total = layanan_collection.count_documents({})
+
+        
+        layanans = layanan_collection.find().sort('_id', -1).skip((page - 1) * per_page).limit(per_page)
+
+        pagination = Pagination(page=page, per_page=per_page, total=total, record_name='promos')
         return render_template(
             'dataLayanan.html', 
             title = "Data Layanan",
             user = users_collection.find_one({"username": session['username']}),
             time = today.strftime('%d %B %Y'),
-            data = layanan_collection.find(),
-            data_count = layanan_collection.count_documents({})
+            data = layanans,
+            data_count = layanan_collection.count_documents({}),
+            pagination=pagination
             )
+    elif 'username' in session and session.get('role') == '2':
+        return redirect(url_for('home'))
     else:
         flash('Harap login terlebih dahulu!', 'warning')
         return redirect(url_for('login'))
@@ -474,7 +688,7 @@ def dataLayanan():
 
 @app.route('/dataLayananEdit', methods=['POST'])
 def dataLayananEdit():
-    if 'username' in session:
+    if 'username' in session and session.get('role') == '1':
         try:
             layanan_id = request.form.get('id')
             layanan = layanan_collection.find_one({"_id": ObjectId(layanan_id)})
@@ -484,12 +698,16 @@ def dataLayananEdit():
 
             judul = request.form.get('judul')
             harga = request.form.get('harga')
+            kategori = request.form.get('kategori')
+            wp = request.form.get('wp')
             deskripsi = request.form.get('deskripsi')
             foto = request.files.get('foto')
 
             update_data = {
                 "judul": judul,
                 "harga": harga,
+                "kategori": kategori,
+                "wp": wp,
                 "deskripsi": deskripsi
             }
 
@@ -515,7 +733,8 @@ def dataLayananEdit():
 
         except Exception as e:
             return jsonify({'status': 'error', 'msg': f'Error: {e}'})
-
+    elif 'username' in session and session.get('role') == '2':
+        return redirect(url_for('home'))
     else:
         flash('Harap login terlebih dahulu!', 'warning')
         return redirect(url_for('login'))
@@ -570,7 +789,7 @@ def search_layanan():
 # ========================= Data Promo ========================
 @app.route('/dataPromo', methods=['GET', 'POST'])
 def dataPromo():
-    if 'username' in session:
+    if 'username' in session and session.get('role') == '1':
         if request.method == 'POST':
             try:
                 judul = request.form.get('judul')
@@ -607,21 +826,34 @@ def dataPromo():
                 return jsonify({'status': 'error', 'msg': f'Error: {e}'})
 
         today = datetime.now()
+
+        page = request.args.get('page', 1, type=int)  
+        per_page = 5  
+        
+        total = promo_collection.count_documents({})
+
+        
+        promos = promo_collection.find().sort('_id', -1).skip((page - 1) * per_page).limit(per_page)
+
+        pagination = Pagination(page=page, per_page=per_page, total=total, record_name='promos')
         return render_template(
             'dataPromo.html', 
             title = "Data Promo",
             user = users_collection.find_one({"username": session['username']}),
             time = today.strftime('%d %B %Y'),
-            data = promo_collection.find(),
-            data_count = promo_collection.count_documents({})
+            data = promos,
+            data_count = promo_collection.count_documents({}),
+            pagination=pagination
             )
+    elif 'username' in session and session.get('role') == '2':
+        return redirect(url_for('home'))
     else:
         flash('Harap login terlebih dahulu!', 'warning')
         return redirect(url_for('login'))
 
 @app.route('/dataPromoEdit', methods=['POST'])
 def dataPromoEdit():
-    if 'username' in session:
+    if 'username' in session and session.get('role') == '1':
         try:
             promo_id = request.form.get('id')
             promo = promo_collection.find_one({"_id": ObjectId(promo_id)})
@@ -661,7 +893,8 @@ def dataPromoEdit():
 
         except Exception as e:
             return jsonify({'status': 'error', 'msg': f'Error: {e}'})
-
+    elif 'username' in session and session.get('role') == '2':
+        return redirect(url_for('home'))
     else:
         flash('Harap login terlebih dahulu!', 'warning')
         return redirect(url_for('login'))

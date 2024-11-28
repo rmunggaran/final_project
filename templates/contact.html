@@ -1,0 +1,102 @@
+{% extends "main.html" %}
+{% block title %}Contact - Forty Seven Laundry{% endblock %} 
+{% block header %}
+<h1>Contact Us</h1>
+{% endblock %}
+{% block content %}
+  <style>
+    .contact-form {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .contact-info h5 {
+        color: #ff5733;
+        font-weight: bold;
+      }
+
+      .contact-info p {
+        color: #555;
+      }
+
+      .contact-info img {
+        width: 40px;
+        margin-right: 10px;
+      }
+
+      .contact-info {
+        margin-top: 30px; 
+      }
+
+      .map-container {
+        max-width: 900px; 
+        height: 25rem;
+        margin: 0 auto;  
+      }
+  </style>
+
+
+    <!-- CONTACT SECTION -->
+    <section id="contact" class="py-5">
+      <div class="container">
+        <div class="row">
+          <!-- Formulir Kontak -->
+          <div class="col-lg-6">
+            <div class="contact-form">
+              <h2>Lokasi Kami</h2>
+              <p>Temukan kami di lokasi berikut:</p>
+              <div style="height: 20rem;">
+                {% if contact.maps %}
+                  {{ contact.maps | safe }}
+                {% else %}
+                  <p>tidak ada data</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Informasi Kontak -->
+          <div class="col-lg-6">
+            <div class="contact-info">
+              <h2>Info Kontak</h2>
+              <div class="mb-3">
+                <h5>Alamat:</h5>
+                {% if contact.alamat %}
+                  <p>{{ contact.alamat }}</p>
+                {% else %}
+                  <p>tidak ada data</p>
+                {% endif %}
+              </div>
+              <div class="mb-3">
+                <h5>Telepon:</h5>
+                {% if contact.nomor %}
+                  <p>{{ contact.nomor | format_phone }}</p>
+                {% else %}
+                  <p>tidak ada data</p>
+                {% endif %}
+              </div>
+              <div class="mb-3">
+                <h5>Email:</h5>
+                {% if contact.email %}
+                  <p>{{ contact.email }}</p>
+                {% else %}
+                  <p>tidak ada data</p>
+                {% endif %}
+              </div>
+              <h5>Ikuti Kami:</h5>
+              <div class="social-icons">
+                <a href="{% if contact.social_media.instagram %}{{ contact.social_media.instagram }}{% else %}#{% endif %}" target="_blank"><img src="/static/img/asset/instagram.png" alt="Instagram" /></a>
+                <a href="{% if contact.social_media.tiktok %}{{ contact.social_media.tiktok }}{% else %}#{% endif %}" target="_blank"><img src="/static/img/asset/tiktok.png" alt="TikTok" /></a>
+                <a href="{% if contact.nomor %}https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan{% else %}#{% endif %}" target="_blank"><img src="/static/img/asset/whatsapp.png" alt="Whatsapp" /></a>
+              </div>
+            </div>
+          </div>
+          
+          </div>
+        </div>
+      </div>
+    </section>
+{% endblock %}
+    

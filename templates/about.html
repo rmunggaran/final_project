@@ -1,0 +1,307 @@
+{% extends "main.html" %}
+{% block title %}About - Forty Seven Laundry{% endblock %} 
+{% block header %}
+<h1>About</h1>
+{% endblock %}
+{% block content %}
+  <style>
+    #about-section {
+        padding: 40px 20px;
+        background-color: #f9f9f9; 
+      }
+
+      #about-section h2 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #ff5733;
+      }
+
+      #about-section p {
+        font-size: 1rem;
+        color: #555;
+        line-height: 1.8;
+      }
+
+      #about-section img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      #about-section .btn {
+        background-color: #ff5733;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+      }
+
+      #about-section .btn:hover {
+        background-color: #ff4500;
+        transition: 0.3s ease;
+      }
+
+      .about-title {
+        font-size: 2.5rem;
+        font-weight: bold; 
+        color: #ff5733;
+        margin-bottom: 20px;
+      }
+
+      .intro-logo {
+        width: 500px; 
+        height: auto; 
+      }
+
+      .intro-content h5 {
+        font-size: 1rem; 
+        line-height: 1.8; 
+        color: #555; 
+      }
+
+      .intro-content .btn {
+        margin-top: 20px;
+        background-color: #ff5733; 
+        color: #fff;
+        border: none; 
+      }
+
+      .intro-content .btn:hover {
+        background-color: #e14a2e; 
+      }
+
+      .full-image {
+        width: 100%; 
+        height: auto;
+        overflow: hidden; 
+        margin-bottom: 40px; 
+      }
+
+      .full-image img {
+        width: 100%; 
+        height: auto; 
+        display: block; 
+      }
+
+      #experience {
+        padding: 50px 20px;
+        background-color: #f9f9f9;
+      }
+
+      #experience .row {
+        display: flex;
+        justify-content: space-between; 
+        gap: 20px;
+        flex-wrap: wrap; 
+      }
+
+      #experience .col-md-6 {
+        flex: 1;
+        text-align: center;
+        padding: 20px;
+        display: flex;
+        flex-direction: column; 
+        align-items: center;
+      }
+
+      #experience h3 {
+        font-size: 1.8rem;
+        color: #ff5733; 
+        font-weight: bold;
+        margin-top: 20px; 
+      }
+
+      #experience p {
+        color: #555;
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-top: 10px; 
+      }
+
+      #experience .img-fluid {
+        max-width: 30%; 
+        height: auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      #experience .why-icon {
+        width: 40px; 
+        height: 40px;
+        margin-bottom: 10px; 
+      }
+
+      #experience .col-md-6 .why-icon,
+      #experience .col-md-6 h3,
+      #experience .col-md-6 p {
+        display: block; 
+        text-align: center; 
+      }
+
+      #vision-mission {
+        padding: 40px 20px;
+        background-color: #ffffff;
+      }
+
+      #vision-mission h2 {
+        font-size: 2.5rem;
+        color: #ff5733;
+        font-weight: bold;
+        margin-bottom: 30px;
+        text-align: center; 
+      }
+
+      #vision-mission .row {
+        display: flex;
+        gap: 20px;
+        justify-content: space-between;
+      }
+
+      #vision-mission .col-md-6 {
+        flex: 1; 
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        background-color: #f9f9f9;
+      }
+
+      #vision-mission h4 {
+        font-size: 1.6rem;
+        color: #333;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      #vision-mission p {
+        font-size: 1rem;
+        color: #555;
+        line-height: 1.8;
+        text-align: justify;
+      }
+
+      @media (max-width: 768px) {
+        #vision-mission .row {
+          flex-direction: column;
+        }
+        #vision-mission .col-md-6 {
+          margin-bottom: 20px;
+        }
+      }
+
+      .section-divider {
+        border: 0;
+        height: 3px;
+        background-color: #797979; 
+        margin: 40px 0;
+      }
+
+      #slogan {
+        padding-bottom: 40px;
+      }
+
+      #slogan h2 {
+        font-size: 28px;
+        font-weight: bold;
+        color: #ff5733;
+        margin-bottom: 15px;
+      }
+
+      #slogan p {
+        font-size: 16px;
+        color: #555;
+      }
+
+      #slogan .btn {
+        margin-top: 20px;
+        background-color: #ff5733;
+        color: white;
+        padding: 10px 25px;
+      }
+
+      #slogan .btn:hover {
+        background-color: #e14a2e;
+      }
+
+  </style>
+
+
+     <!-- ABOUT SECTION -->
+     <section id="about">
+      <div class="container text-center" style="margin-top: 80px">
+        <h2 class="about-title">Forty Seven Laundry PKU</h2>
+        
+        <div class="d-flex align-items-center justify-content-center">
+          {% if profile.logo %}
+          <img class="intro-logo" src="{{ url_for('static', filename='img/logo/' + profile.logo) }}">
+          {% else %}
+          <img class="intro-logo" src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
+          {% endif %}
+          <div class="intro-content ms-4 text-start">
+            {% if profile %}
+                <h5>
+                    {{ profile.deskripsi | safe }}
+                </h5>
+                {% if contact.nomor %}
+                    <a href="https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan" class="btn btn-secondary">Pesan Sekarang</a>
+                {% else %}
+                    <a href="https://wa.me/6282173515200?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan" class="btn btn-secondary">Pesan Sekarang</a>
+                {% endif %}
+            {% else %}
+                <h2>Tidak ada data</h2>
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Beatae, ipsum officiis harum quisquam repellendus doloribus voluptatibus distinctio ut molestiae unde error libero facilis minima dolores fuga quidem aperiam dolorum enim. Inventore rerum, deleniti velit accusantium facilis delectus tenetur voluptas unde quam perspiciatis dolorem voluptate numquam id odit eum repudiandae explicabo?
+                </p>
+                <a href="https://wa.me/6282173515200?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan" class="btn btn-secondary">Pesan Sekarang</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+   <section id="experience">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 text-center">
+          <img src="/static/img/asset/reputation.png" alt="Tenaga Berpengalaman" class="img-fluid mb-3" />
+          <h3>Tenaga Berpengalaman</h3>
+          <p>Tim kami terdiri dari tenaga ahli yang sudah berpengalaman di bidang laundry untuk memastikan kualitas terbaik dalam setiap layanan.</p>
+        </div>
+        <div class="col-md-6 text-center">
+          <img src="/static/img/asset/customer.png" alt="Kepuasan Pelanggan" class="img-fluid mb-3" />
+          <h3>Kepuasan Pelanggan Adalah Utama</h3>
+          <p>Kami selalu mengutamakan kepuasan pelanggan dengan memberikan layanan yang cepat, tepat, dan berkualitas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about-section">
+      <div class="full-image">
+        <img src="/static/img/asset/laundry.jpg" alt="Tentang Kami" class="img-fluid">
+      </div>
+      <section id="vision-mission">
+        <h2>Visi dan Misi</h2>
+        <div class="row">
+          <div class="col-md-6">
+            <h4>Visi</h4>
+            {% if profile %}
+              <p>{{ profile.visi | safe }}</p>
+            {% else %}
+              <p>Tidak ada data</p>
+            {% endif %}
+          </div>
+          <div class="col-md-6">
+            <h4>Misi</h4>
+            {% if profile %}
+              <p>{{ profile.misi | safe }}</p>
+            {% else %}
+              <p>Tidak ada data</p>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+{% endblock %}
+    
