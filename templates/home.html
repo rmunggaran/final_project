@@ -48,6 +48,12 @@
         let review = $("#review").val();
         let rating = $("#rating").val();
 
+        if (!name || !review || !rating ) {
+            $('#modalMessageW').text('Data yang anda masukkan belum lengkap. Harap isi semua bidang yang diperlukan.');
+            $("#warningModal").modal("show");
+            return; 
+        }
+
         let formData = new FormData();
 
         formData.append('id_user', id);
