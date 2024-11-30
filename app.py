@@ -223,6 +223,7 @@ def login():
         user = users_collection.find_one({"email": email})
 
         if user and check_password_hash(user['password'], password):
+            session['id'] = str(user['_id'])
             session['username'] = user['username']
             session['role'] = user['role']
             
@@ -250,6 +251,14 @@ def register():
 
             if password != confirm_password:
                 return jsonify({'status': 'error', 'msg': 'Passwords do not match!'})
+            
+            existing_email = users_collection.find_one({'email': email})
+            if existing_email:
+                return jsonify({'status': 'error', 'msg': 'Email telah digunakan!'})
+
+            existing_nomor = users_collection.find_one({'nomor': nomor})
+            if existing_nomor:
+                return jsonify({'status': 'error', 'msg': 'Nomor telah digunakan!'})
 
             hashed_password = generate_password_hash(password)
 
@@ -289,11 +298,23 @@ def logout():
 def dashboard():
     if 'username' in session and session.get('role') == '1':
         today = datetime.now()
+
+        page = request.args.get('page', 1, type=int)  
+        per_page = 5  
+        
+        total = users_collection.count_documents({})
+
+        
+        users = users_collection.find().sort('role', 1).skip((page - 1) * per_page).limit(per_page)
+        pagination = Pagination(page=page, per_page=per_page, total=total, record_name='promos')
         return render_template(
             'dashboard.html', 
             title = "Dashboard",
-            user = users_collection.find_one({"username": session['username']}),
-            time = today.strftime('%d %B %Y')
+            user = users_collection.find_one({"_id": ObjectId(session['id'])}),
+            data = users,
+            data_count = total,
+            time = today.strftime('%d %B %Y'),
+            pagination=pagination
             )
     elif 'username' in session and session.get('role') == '2':
         return redirect(url_for('home'))
@@ -382,6 +403,29 @@ def change_password():
         return jsonify({'status': 'success', 'msg': 'Password berhasil diganti.'})
     else:
         return jsonify({'status': 'error', 'msg': f'Error: Terjadi kesalahan, password tidak dapat diubah.'})
+    
+@app.route('/update-role', methods=['POST'])
+def update_role():
+    data = request.json 
+    user_id = data.get('user_id')
+    new_role = data.get('role')
+
+    if not user_id or not new_role:
+        return jsonify({'status': 'error', 'msg': 'Data tidak lengkap.'})
+
+    try:
+        result = users_collection.update_one(
+            {'_id': ObjectId(user_id)},
+            {'$set': {'role': new_role}}
+        )
+
+        if result.modified_count > 0:
+            return jsonify({'status': 'success', 'msg': 'Role berhasil diperbarui.'})
+        else:
+            return jsonify({'status': 'warning', 'msg': 'Role tidak berubah atau pengguna tidak ditemukan.'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'msg': f'Error: {str(e)}'})
+
 # ================ End Dashboard Admin ====================    
 
 
@@ -430,7 +474,7 @@ def profilePerusahaan():
         return render_template(
             'profilePerusahaan.html', 
             title = "Profile Perusahaan",
-            user = users_collection.find_one({"username": session['username']}),
+            user = users_collection.find_one({"_id": ObjectId(session['id'])}),
             time = today.strftime('%d %B %Y'),
             data = profile_collection.find_one(),
             )
@@ -544,7 +588,7 @@ def dataContact():
         return render_template(
             'dataContact.html', 
             title = "Data Contact",
-            user = users_collection.find_one({"username": session['username']}),
+            user = users_collection.find_one({"_id": ObjectId(session['id'])}),
             time = today.strftime('%d %B %Y'),
             data = contact_collection.find_one(),
             )
@@ -673,7 +717,7 @@ def dataLayanan():
         return render_template(
             'dataLayanan.html', 
             title = "Data Layanan",
-            user = users_collection.find_one({"username": session['username']}),
+            user = users_collection.find_one({"_id": ObjectId(session['id'])}),
             time = today.strftime('%d %B %Y'),
             data = layanans,
             data_count = layanan_collection.count_documents({}),
@@ -839,7 +883,7 @@ def dataPromo():
         return render_template(
             'dataPromo.html', 
             title = "Data Promo",
-            user = users_collection.find_one({"username": session['username']}),
+            user = users_collection.find_one({"_id": ObjectId(session['id'])}),
             time = today.strftime('%d %B %Y'),
             data = promos,
             data_count = promo_collection.count_documents({}),

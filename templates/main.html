@@ -13,6 +13,7 @@
 
     <title>{% block title %}{% endblock %}</title>
 
+    <link href="{{ url_for('static', filename='img/asset/logo.png') }}" rel="icon" />
     <!-- icon -->
     <link href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
 
@@ -22,7 +23,108 @@
       .text-custom{
         color: #f9d71c;
       }
+      .form-group{
+        margin-bottom: 1rem;
+      }
     </style>
+    <script>
+      function editprofile(id) {
+          let name = $("#name").val(); 
+          let username = $("#username").val();
+          let email = $("#email").val();
+          let alamat = $("#alamat").val();
+          let no_telepon = $("#no_telepon").val();
+          let foto_profil = $('#foto_profil').prop("files")[0];
+  
+  
+          let formData = new FormData();
+  
+          formData.append('id', id);
+          formData.append('name', name);
+          formData.append('username', username);
+          formData.append('email', email);
+          formData.append('alamat', alamat);
+          formData.append('no_telepon', no_telepon);
+          formData.append('foto_profil', foto_profil); 
+  
+          $.ajax({
+              type: "POST",
+              url: "/editprofile",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function (response) {
+                  if (response.status === "success") {
+                      $('#modalMessage').text(response.msg);
+                      $("#successModal").modal("show");
+                      $('#successModal').on('hidden.bs.modal', function () {
+                          window.location.reload();
+                      });
+                  } else if (response.status === "error") {
+                      $('#modalMessageE').text(response.msg);
+                      $("#errorModal").modal("show");
+                      $('#errorModal').on('hidden.bs.modal', function () {
+                          window.location.reload();
+                      });
+                  } else  {
+                      $('#modalMessageW').text(response.msg);
+                      $("#warningModal").modal("show");
+                      $('#warningModal').on('hidden.bs.modal', function () {
+                          window.location.reload();
+                      });
+                  }
+              },
+              error: function (xhr, status, error) {
+                  let errorMessage = xhr.responseJSON ? xhr.responseJSON.msg : 'Terjadi kesalahan';
+                  $('#modalMessageE').text(errorMessage);
+                  $("#errorModal").modal("show");
+              }
+          });
+      }
+  
+      function change_password(id){
+          let current_password = $("#current_password").val();
+          let new_password = $("#new_password").val();
+          let new_password_confirmation = $("#new_password_confirmation").val();
+  
+          $.ajax({
+              type: "POST",
+              url: "/change_password",
+              data: {
+                  id:id,
+                  current_password:current_password,
+                  new_password:new_password,
+                  new_password_confirmation:new_password_confirmation
+              },
+              success: function (response) {
+                  if (response.status === "success") {
+                      $('#modalMessage').text(response.msg);
+                      $("#successModal").modal("show");
+                      $('#successModal').on('hidden.bs.modal', function () {
+                          window.location.reload();
+                      });
+                  } else if (response.status === "error") {
+                      $('#modalMessageE').text(response.msg);
+                      $("#errorModal").modal("show");
+                      $('#errorModal').on('hidden.bs.modal', function () {
+                          window.location.reload();
+                      });
+                  } else  {
+                      $('#modalMessageW').text(response.msg);
+                      $("#warningModal").modal("show");
+                      $('#warningModal').on('hidden.bs.modal', function () {
+                          window.location.reload();
+                      });
+                  }
+              },
+              error: function (xhr) {
+                  let errorMessage = xhr.responseJSON ? xhr.responseJSON.msg : 'Terjadi kesalahan';
+                  $('#modalMessageE').text(errorMessage);
+                  $("#errorModal").modal("show");
+              }
+          });
+      }
+  </script>
   </head>
   <body>
 
@@ -97,8 +199,13 @@
                     </li>
                   {% else %}
                     <li>
-                        <a class="dropdown-item" href="/dashboard">
-                          <i class="far fa-user-circle"></i> Profile
+                        <a class="dropdown-item" data-toggle="modal" data-target="#EditProfileModal{{ user._id }}">
+                          <i class="far fa-user-circle"></i> Edit Profile
+                        </a>
+                    </li> 
+                    <li>
+                        <a class="dropdown-item" data-toggle="modal" data-target="#GantiPModal{{ user._id }}">
+                          <i class="fas fa-key"></i> Ganti Password
                         </a>
                     </li> 
                   {% endif %}
@@ -190,6 +297,79 @@
         </div>
       </div>
     </footer>
+
+    <!-- Modal -->
+    <div class="modal fade" id="EditProfileModal{{ user._id }}" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="fw-bold">Edit Profile</h5>
+            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body row">
+            <div class="form-group">
+              <input type="text" class="form-control form-control-user" name="name" id="name"
+                  placeholder="Ujang jamaludin" value="{{ user.name }}" required>
+              </div>
+              <div class="form-group">
+                  <input type="text" class="form-control form-control-user" name="username" id="username"
+                      placeholder="Ujang jamaludin" value="{{ user.username }}" required>
+              </div>
+              <div class="form-group">
+                  <input type="email" class="form-control form-control-user" name="username" id="email"
+                      placeholder="Ujang jamaludin" value="{{ user.email }}" required>
+              </div>
+              <div class="form-group">
+                  <input type="text" class="form-control form-control-user" name="alamat" id="alamat"
+                      placeholder="Alamat lengkap" value="{{ user.alamat }}" required>
+              </div>
+              <div class="form-group">
+                  <input type="number" class="form-control form-control-user" name="no_telepon" id="no_telepon"
+                      placeholder="089993899389" value="{{ user.tlp }}" required>
+              </div>
+              <div class="form-group">
+                  <input type="file" class="form-control form-control-user" name="foto_profil" id="foto_profil">
+              </div>
+              <div class="form-group">
+                <button type="submit" class="btn btn-costum" data-dismiss="modal" onclick="editprofile('{{ user._id }}')" >
+                    Edit
+                </button>
+              </div>
+          </div>
+        </div>
+      </div>
+  </div>
+
+    <!-- Modal Ganti password-->
+    <div class="modal fade" id="GantiPModal{{ user._id }}" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="fw-bold">Edit Profile</h5>
+            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body row">
+            <div class="form-group">
+              <div class="form-group">
+                <input type="password" class="form-control " id="current_password"
+                    name="current_password" placeholder="Masukan password lama" required>
+              </div>
+              <div class="form-group">
+                  <input type="password" class="form-control " id="new_password" name="new_password"
+                      placeholder="Masukan password baru" required>
+              </div>
+              <div class="form-group">
+                  <input type="password" class="form-control " id="new_password_confirmation"
+                      name="new_password_confirmation" placeholder="Konfirmasi password baru" required>
+              </div>
+              <div class="form-group">
+                <button type="submit" class="btn btn-costum" data-dismiss="modal" onclick="change_password('{{ user._id }}')">Ganti password</button>
+              </div>
+          </div>
+        </div>
+      </div>
+  </div>
+  </div>
 
     <!-- Modal -->
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">

@@ -99,6 +99,42 @@
             }
         });
     }
+    function changeRole(userId, newRole) {
+        fetch(`/update-role`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: userId,
+                role: newRole
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                $('#modalMessage').text(data.msg);
+                $("#successModal").modal("show");
+                $('#successModal').on('hidden.bs.modal', function () {
+                    window.location.reload();
+                });
+            } else {
+                $('#modalMessageE').text(data.msg);
+                $("#errorModal").modal("show");
+                $('#errorModal').on('hidden.bs.modal', function () {
+                    window.location.reload();
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            $('#modalMessageE').text(error);
+            $("#errorModal").modal("show");
+            $('#errorModal').on('hidden.bs.modal', function () {
+                window.location.reload();
+            });
+        });
+    }
 </script>
 
 
@@ -258,6 +294,57 @@
                             name="new_password_confirmation" placeholder="Konfirmasi password baru" required>
                     </div>
                     <button type="submit" class="btn btn-costum" onclick="change_password('{{ user._id }}')">Ganti password</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- User -->
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-costum">User</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    {% if data_count > 0 %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>no</th>
+                                        <th>nama</th>
+                                        <th>username</th>
+                                        <th>Email</th>
+                                        <th>Nomor</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for dt in data %}
+                                        <tr>
+                                            <td class="col-1">{{ loop.index }}</td>
+                                            <td class="col-2">{{ dt.name }}</td>
+                                            <td class="col-2">{{ dt.username }}</td>
+                                            <td>{{ dt.email }}</td>
+                                            <td>{{ dt.tlp }}</td>
+                                            <td class="col-2">
+                                                <select name="role" class="form-select" onchange="changeRole('{{ dt._id }}', this.value)">
+                                                    <option value="1" {% if dt.role == '1' %}selected{% endif %}>Admin</option>
+                                                    <option value="2" {% if dt.role == '2' %}selected{% endif %}>User</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <div class="d-flex justify-content-center">
+                                {{ pagination.links }}
+                            </div>
+                        </div>
+                    {% else %}
+                        <h4>Belum Ada data</h4>
+                    {% endif %}
                 </div>
             </div>
         </div>
