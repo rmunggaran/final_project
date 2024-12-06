@@ -28,7 +28,7 @@
         <p class="subtitle text-center">CUCI KOMPLIT</p>
         <div class="cardps">
             {% for ck in layanan_ck %}
-            <div class="cardp">
+            <div class="cardp" data-toggle="modal" data-target="#datailLayananModal{{ ck._id }}">
                 {% if ck.foto %}
                 <img class="intro-logo" src="{{ url_for('static', filename='img/layanan/' + ck.foto) }}">
                 {% else %}
@@ -39,7 +39,7 @@
                     <p class="price">Rp {{ ck.harga | format_rupiah }}/kg</p>
                     <p class="duration">{{ ck.wp }}</p>
                     <div class="features">
-                        <p>{{ ck.deskripsi | safe }}</p>
+                        <p>{{ ck.deskripsi | remove_html | limit_taxt(10) }}</p>
                     </div>
                     <a href="{% if contact.nomor %}https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan{% else %}#{% endif %}" class="btn" target="_blank">Pesan Sekarang</a>
                 </div>
@@ -54,7 +54,7 @@
         <div class="container">
         <div class="cardps">
             {% for setrika in layanan_setrika %}
-            <div class="cardp">
+            <div class="cardp" data-toggle="modal" data-target="#datailLayananModal{{ setrika._id }}">
                 {% if setrika.foto %}
                 <img class="intro-logo" src="{{ url_for('static', filename='img/layanan/' + setrika.foto) }}">
                 {% else %}
@@ -65,7 +65,7 @@
                     <p class="price">Rp {{ setrika.harga | format_rupiah }}/kg</p>
                     <p class="duration">{{ setrika.wp }}</p>
                     <div class="features">
-                        <p>{{ setrika.deskripsi | safe }}</p>
+                        <p>{{ setrika.deskripsi | remove_html | limit_taxt(10) }}</p>
                     </div>
                     <a href="{% if contact.nomor %}https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan{% else %}#{% endif %}" class="btn" target="_blank">Pesan Sekarang</a>
                 </div>
@@ -79,8 +79,8 @@
     <section class="price-list mb-5">
         <p class="subtitle text-center">CUCI LIPAT</p>
         <div class="cardps">
-            {% for cl in layanan_cl %}
-            <div class="cardp">
+        {% for cl in layanan_cl %}
+            <div class="cardp" data-toggle="modal" data-target="#datailLayananModal{{ cl._id }}">
                 {% if cl.foto %}
                 <img class="intro-logo" src="{{ url_for('static', filename='img/layanan/' + cl.foto) }}">
                 {% else %}
@@ -91,13 +91,52 @@
                     <p class="price">Rp {{ cl.harga | format_rupiah }}/kg</p>
                     <p class="duration">{{ cl.wp }}</p>
                     <div class="features">
-                        <p>{{ cl.deskripsi | safe }}</p>
+                        <p>{{ cl.deskripsi | remove_html | limit_taxt(10) }}</p>
                     </div>
                     <a href="{% if contact.nomor %}https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan{% else %}#{% endif %}" class="btn" target="_blank">Pesan Sekarang</a>
                 </div>
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
     </section>
+
+    {% for all in layanan_all %}
+        <!-- Modal -->
+        <div class="modal fade" id="datailLayananModal{{ all._id }}" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+              <div class="modal-content">
+                <div class="modal-body row">
+                    <div class="col-12 col-sm-4">
+                        {% if all.foto %}
+                        <img class="img-fluid" src="{{ url_for('static', filename='img/layanan/' + all.foto) }}">
+                        {% else %}
+                        <img class="img-fluid" src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
+                        {% endif %}
+                    </div>
+                    <div class="col">
+                        <div class="row mt-3 ms-2">
+                            <div class="col-10">
+                                <h4>{{ all.judul }}</h4>
+                                <p class="price">Rp {{ all.harga | format_rupiah }}/kg</p>
+                                <p class="duration">{{ all.wp }}</p>
+                            </div>
+                            <div class="col">
+                                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                        </div>
+                      <p>{{ all.deskripsi | safe }}</p>
+                      <div class="">
+                          {% if contact.nomor %}
+                              <a href="https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan" target="_blank" class="btn btn-secondary ms-3">Pesan Sekarang</a>
+                          {% else %}
+                              <a href="https://wa.me/6282173515200?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan" target="_blank" class="btn btn-secondary ms-3">Pesan Sekarang</a>
+                          {% endif %}
+                      </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    {% endfor %}
 {% endblock %}
     

@@ -150,6 +150,17 @@
         footer span {
             font-weight: bold;
         }
+        .register a {
+        color: black;
+        font-weight: bold;
+        text-decoration: none;
+        transition: color 0.3s ease;
+        }
+
+        .register a:hover {
+          color: #e0b838;
+          text-decoration: underline;
+        }
 
     </style>
     <script>
@@ -230,15 +241,15 @@
             <input type="hidden" id="role" value="2">
             <div class="form-group">
                 <label for="name">Name</label>
-                <input type="text" id="name" placeholder="munggaran">
+                <input type="text" id="name" placeholder="Name">
             </div>
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Rifki252">
+                <input type="text" id="username" placeholder="Username">
             </div>
             <div class="form-group">
                 <label for="email">E-Mail</label>
-                <input type="email" id="email" placeholder="rmunggaran@gmail.com">
+                <input type="email" id="email" placeholder="Email">
             </div>
             <div class="form-group">
                 <label for="alamat">Alamat</label>
@@ -260,7 +271,7 @@
                 <button type="submit" onclick="register()">Register</button>
             </div>
 
-            <p class="register">Your have an account? <a href="/login">Login Now</a></p>
+            <p class="register">Your have an account? <a href="/login" class="register">Login Now</a></p>
     </div>
 
     

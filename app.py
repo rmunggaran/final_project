@@ -4,6 +4,7 @@ from bson.objectid import ObjectId
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
 from flask_paginate import Pagination
+from bs4 import BeautifulSoup
 import os
 import re
 
@@ -39,6 +40,12 @@ def limit_taxt(value, word_limit):
     return value
 
 app.jinja_env.filters['limit_taxt'] = limit_taxt 
+
+def remove_html_tags(text):
+    soup = BeautifulSoup(text, "html.parser")
+    return soup.get_text()
+
+app.jinja_env.filters['remove_html'] = remove_html_tags
 
 @app.template_filter('format_rupiah')
 def format_rupiah(value):
@@ -120,6 +127,7 @@ def layanan():
         profile = profile_collection.find_one(),
         contact = contact_collection.find_one(),
         promo = promo_collection.find().sort('judul', -1),
+        layanan_all = layanan_collection.find().sort('judul', -1),
         layanan_ck = layanan_collection.find({"kategori": "ck"}).sort('judul', -1),
         layanan_setrika = layanan_collection.find({"kategori": "setrika"}).sort('judul', -1),
         layanan_cl = layanan_collection.find({"kategori": "cl"}).sort('judul', -1)
@@ -267,7 +275,7 @@ def register():
                 'username': username,
                 'email': email,
                 'alamat': alamat,
-                'nomor': nomor,
+                'tlp': nomor,
                 'password': hashed_password,
                 'role': role
             }

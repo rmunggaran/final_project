@@ -386,6 +386,34 @@ header .btn:hover {
   margin-bottom: 15px;
 }
 
+.modal .price {
+  color: #f9d71c;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.modal .duration {
+  font-size: 16px;
+  color: #777;
+  margin-bottom: 15px;
+}
+
+.modal .btn {
+  background-color: #f9d71c;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.modal .btn:hover {
+  background-color: #e6c100;
+}
+
 .cardp .features {
   list-style: none;
   padding: 0;

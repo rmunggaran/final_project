@@ -198,6 +198,20 @@
         .alert-warning {
             background-color: #ff9800; 
         }
+
+        .back-button a,
+        .register a {
+          color: #f7c740; 
+          font-weight: bold;
+          text-decoration: none;
+          transition: color 0.3s ease;
+        }
+
+        .back-button a:hover,
+        .register a:hover {
+          color: #e0b838;
+          text-decoration: underline;
+        }
        
         footer {
             background-color: #FBCE19;
@@ -208,7 +222,7 @@
 
         footer p {
             font-size: 14px;
-            color: #333;
+            color: white;
         }
         @media (max-width: 768px) {
             .container {
@@ -271,7 +285,7 @@
     <div class="container">
         
         <div class="back-button">
-            <a href="/">Back to the main page</a>
+            <a href="/" class="back-button">Back to the main page</a>
         </div>
 
         
@@ -301,7 +315,7 @@
             
             <button type="submit" class="btn-login">Login</button>
         </form>
-        <p class="register">Don't have an account? <a href="/register">Register Now</a></p>
+        <p class="register">Don't have an account? <a href="/register" class="register">Register Now</a></p>
 
     </div>
 
