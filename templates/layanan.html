@@ -1,142 +1,199 @@
-{% extends "main.html" %}
-{% block title %}Layanan - Forty Seven Laundry{% endblock %} 
-{% block header %}
+{% extends "main.html" %} {% block title %}Layanan - Forty Seven Laundry{%
+endblock %} {% block header %}
 <h1>Layanan</h1>
 <p>Forty Seven Laundry PKU</p>
-{% endblock %}
-{% block content %}
-  <style>
-
-  </style>
-
+{% endblock %} {% block content %}
+<style></style>
 
 <section class="promo-intro">
-    <div class="container">
-        <h2 class="section-title">PRICE LIST KILOAN</h2>
-        <p>Dengan layanan laundry kiloan yang cepat, efisien, dan harga terjangkau, kami siap membantu Anda
-            menghemat waktu dan tenaga. Lihat daftar harga lengkap di bawah ini.</p>
-        <div class="arrows">
-            <span>&#x2193;</span>
-            <span>&#x2193;</span>
-            <span>&#x2193;</span>
-        </div>
+  <div class="container">
+    <h2 class="section-title">PRICE LIST KILOAN</h2>
+    <p>
+      Dengan layanan laundry kiloan yang cepat, efisien, dan harga terjangkau,
+      kami siap membantu Anda menghemat waktu dan tenaga. Lihat daftar harga
+      lengkap di bawah ini.
+    </p>
+    <div class="arrows">
+      <span>&#x2193;</span>
+      <span>&#x2193;</span>
+      <span>&#x2193;</span>
     </div>
+  </div>
 </section>
 <main>
-    <!--CUCI KOMPLIT -->
-    <section class="price-list">
-        <p class="subtitle text-center">CUCI KOMPLIT</p>
-        <div class="cardps">
-            {% for ck in layanan_ck %}
-            <div class="cardp" data-toggle="modal" data-target="#datailLayananModal{{ ck._id }}">
-                {% if ck.foto %}
-                <img class="intro-logo" src="{{ url_for('static', filename='img/layanan/' + ck.foto) }}">
-                {% else %}
-                <img class="intro-logo" src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
-                {% endif %}
-                <div class="cardp-content">
-                    <h3>{{ ck.judul }}</h3>
-                    <p class="price">Rp {{ ck.harga | format_rupiah }}/kg</p>
-                    <p class="duration">{{ ck.wp }}</p>
-                    <div class="features">
-                        <p>{{ ck.deskripsi | remove_html | limit_taxt(10) }}</p>
-                    </div>
-                    <a href="{% if contact.nomor %}https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan{% else %}#{% endif %}" class="btn" target="_blank">Pesan Sekarang</a>
-                </div>
-            </div>
-            {% endfor %}
+  <!--CUCI KOMPLIT -->
+  <section class="price-list">
+    <p class="subtitle text-center">CUCI KOMPLIT</p>
+    <div class="cardps">
+      {% for ck in layanan_ck %}
+      <div
+        class="cardp"
+        data-toggle="modal"
+        data-target="#datailLayananModal{{ ck._id }}">
+        {% if ck.foto %}
+        <img
+          class="intro-logo"
+          src="{{ url_for('static', filename='img/layanan/' + ck.foto) }}" />
+        {% else %}
+        <img
+          class="intro-logo"
+          src="{{ url_for('static', filename='img/undraw_profile.svg') }}" />
+        {% endif %}
+        <div class="cardp-content">
+          <h3>{{ ck.judul | limit_taxt(4) }}</h3>
+          <p class="price">Rp {{ ck.harga | format_rupiah }}/kg</p>
+          <p class="duration">{{ ck.wp }}</p>
+          <div class="features">
+            <p>{{ ck.deskripsi | remove_html | limit_taxt(10) }}</p>
+          </div>
+          <a
+            href="{% if contact.nomor %}https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan{% else %}#{% endif %}"
+            class="btn"
+            target="_blank"
+            >Pesan Sekarang</a
+          >
         </div>
-    </section>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
 
-    <!--Setrika -->
-    <section class="price-list white-bg ">
-        <p class="subtitle text-center">SETRIKA</p>
-        <div class="container">
-        <div class="cardps">
-            {% for setrika in layanan_setrika %}
-            <div class="cardp" data-toggle="modal" data-target="#datailLayananModal{{ setrika._id }}">
-                {% if setrika.foto %}
-                <img class="intro-logo" src="{{ url_for('static', filename='img/layanan/' + setrika.foto) }}">
-                {% else %}
-                <img class="intro-logo" src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
-                {% endif %}
-                <div class="cardp-content">
-                    <h3>{{ setrika.judul }}</h3>
-                    <p class="price">Rp {{ setrika.harga | format_rupiah }}/kg</p>
-                    <p class="duration">{{ setrika.wp }}</p>
-                    <div class="features">
-                        <p>{{ setrika.deskripsi | remove_html | limit_taxt(10) }}</p>
-                    </div>
-                    <a href="{% if contact.nomor %}https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan{% else %}#{% endif %}" class="btn" target="_blank">Pesan Sekarang</a>
-                </div>
+  <!--Setrika -->
+  <section class="price-list white-bg">
+    <p class="subtitle text-center">SETRIKA</p>
+    <div class="container">
+      <div class="cardps">
+        {% for setrika in layanan_setrika %}
+        <div
+          class="cardp"
+          data-toggle="modal"
+          data-target="#datailLayananModal{{ setrika._id }}">
+          {% if setrika.foto %}
+          <img
+            class="intro-logo"
+            src="{{ url_for('static', filename='img/layanan/' + setrika.foto) }}" />
+          {% else %}
+          <img
+            class="intro-logo"
+            src="{{ url_for('static', filename='img/undraw_profile.svg') }}" />
+          {% endif %}
+          <div class="cardp-content">
+            <h3>{{ setrika.judul | limit_taxt(4) }}</h3>
+            <p class="price">Rp {{ setrika.harga | format_rupiah }}/kg</p>
+            <p class="duration">{{ setrika.wp }}</p>
+            <div class="features">
+              <p>{{ setrika.deskripsi | remove_html | limit_taxt(10) }}</p>
             </div>
-            {% endfor %}
+            <a
+              href="{% if contact.nomor %}https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan{% else %}#{% endif %}"
+              class="btn"
+              target="_blank"
+              >Pesan Sekarang</a
+            >
+          </div>
         </div>
-        </div>
-    </section>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
 
-    <!--Cuci Lipat -->
-    <section class="price-list mb-5">
-        <p class="subtitle text-center">CUCI LIPAT</p>
-        <div class="cardps">
-        {% for cl in layanan_cl %}
-            <div class="cardp" data-toggle="modal" data-target="#datailLayananModal{{ cl._id }}">
-                {% if cl.foto %}
-                <img class="intro-logo" src="{{ url_for('static', filename='img/layanan/' + cl.foto) }}">
-                {% else %}
-                <img class="intro-logo" src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
-                {% endif %}
-                <div class="cardp-content">
-                    <h3>{{ cl.judul }}</h3>
-                    <p class="price">Rp {{ cl.harga | format_rupiah }}/kg</p>
-                    <p class="duration">{{ cl.wp }}</p>
-                    <div class="features">
-                        <p>{{ cl.deskripsi | remove_html | limit_taxt(10) }}</p>
-                    </div>
-                    <a href="{% if contact.nomor %}https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan{% else %}#{% endif %}" class="btn" target="_blank">Pesan Sekarang</a>
-                </div>
-                {% endfor %}
-            </div>
+  <!--Cuci Lipat -->
+  <section class="price-list mb-5">
+    <p class="subtitle text-center">CUCI LIPAT</p>
+    <div class="cardps">
+      {% for cl in layanan_cl %}
+      <div
+        class="cardp"
+        data-toggle="modal"
+        data-target="#datailLayananModal{{ cl._id }}">
+        {% if cl.foto %}
+        <img
+          class="intro-logo"
+          src="{{ url_for('static', filename='img/layanan/' + cl.foto) }}" />
+        {% else %}
+        <img
+          class="intro-logo"
+          src="{{ url_for('static', filename='img/undraw_profile.svg') }}" />
+        {% endif %}
+        <div class="cardp-content">
+          <h3>{{ cl.judul | limit_taxt(4) }}</h3>
+          <p class="price">Rp {{ cl.harga | format_rupiah }}/kg</p>
+          <p class="duration">{{ cl.wp }}</p>
+          <div class="features">
+            <p>{{ cl.deskripsi | remove_html | limit_taxt(10) }}</p>
+          </div>
+          <a
+            href="{% if contact.nomor %}https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan{% else %}#{% endif %}"
+            class="btn"
+            target="_blank"
+            >Pesan Sekarang</a
+          >
         </div>
-    </section>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
 
-    {% for all in layanan_all %}
-        <!-- Modal -->
-        <div class="modal fade" id="datailLayananModal{{ all._id }}" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-              <div class="modal-content">
-                <div class="modal-body row">
-                    <div class="col-12 col-sm-4">
-                        {% if all.foto %}
-                        <img class="img-fluid" src="{{ url_for('static', filename='img/layanan/' + all.foto) }}">
-                        {% else %}
-                        <img class="img-fluid" src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
-                        {% endif %}
-                    </div>
-                    <div class="col">
-                        <div class="row mt-3 ms-2">
-                            <div class="col-10">
-                                <h4>{{ all.judul }}</h4>
-                                <p class="price">Rp {{ all.harga | format_rupiah }}/kg</p>
-                                <p class="duration">{{ all.wp }}</p>
-                            </div>
-                            <div class="col">
-                                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                        </div>
-                      <p>{{ all.deskripsi | safe }}</p>
-                      <div class="">
-                          {% if contact.nomor %}
-                              <a href="https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan" target="_blank" class="btn btn-secondary ms-3">Pesan Sekarang</a>
-                          {% else %}
-                              <a href="https://wa.me/6282173515200?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan" target="_blank" class="btn btn-secondary ms-3">Pesan Sekarang</a>
-                          {% endif %}
-                      </div>
-                    </div>
-                </div>
+  {% for all in layanan_all %}
+  <!-- Modal -->
+  <div
+    class="modal fade"
+    id="datailLayananModal{{ all._id }}"
+    tabindex="-1"
+    aria-labelledby="responseModalLabel"
+    aria-hidden="true">
+    <div
+      class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-body row">
+          <div class="col-12 col-sm-4">
+            {% if all.foto %}
+            <img
+              class="img-fluid"
+              src="{{ url_for('static', filename='img/layanan/' + all.foto) }}" />
+            {% else %}
+            <img
+              class="img-fluid"
+              src="{{ url_for('static', filename='img/undraw_profile.svg') }}" />
+            {% endif %}
+          </div>
+          <div class="col">
+            <div class="row mt-3 ms-2">
+              <div class="col-10">
+                <h4>{{ all.judul }}</h4>
+                <p class="price">Rp {{ all.harga | format_rupiah }}/kg</p>
+                <p class="duration">{{ all.wp }}</p>
+              </div>
+              <div class="col">
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-dismiss="modal"
+                  aria-label="Close"></button>
               </div>
             </div>
+            <p>{{ all.deskripsi | safe }}</p>
+            <div class="">
+              {% if contact.nomor %}
+              <a
+                href="https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan"
+                target="_blank"
+                class="btn btn-secondary ms-3"
+                >Pesan Sekarang</a
+              >
+              {% else %}
+              <a
+                href="https://wa.me/6282173515200?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan"
+                target="_blank"
+                class="btn btn-secondary ms-3"
+                >Pesan Sekarang</a
+              >
+              {% endif %}
+            </div>
           </div>
-    {% endfor %}
-{% endblock %}
-    
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %} {% endblock %}
+</main>

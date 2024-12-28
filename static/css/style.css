@@ -335,7 +335,7 @@ header .btn:hover {
   background-color: #f9f2ca;
   padding: 40px 20px;
   margin: 0;
-  width: 100vw;
+  width: 100%;
   position: relative;
   left: 50%;
   transform: translateX(-50%);

@@ -1,0 +1,328 @@
+   
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Forty Seven Laundry</title>
+    <link href="{{ url_for('static', filename='img/asset/logo.png') }}" rel="icon" />
+    <style>
+      
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #FDF4C7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+    
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: left;
+            width: 90%;
+            padding: 20px;
+        }
+
+        .logo img {
+            width: 3rem;
+            margin-left: 15px;
+        }
+
+        .header-title {
+            margin-left: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #F7C740;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: white;
+            border-radius: 100px 0 100px 0;
+            padding: 40px 30px;
+            margin-top: 2px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px 
+        }
+
+        .back-button {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .back-button a {
+            font-size: 14px;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+        .back-button a:hover {
+            text-decoration: underline;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .subtext {
+            text-align: center;
+            font-size: 16px;
+            margin-bottom: 30px;
+            color: #000;
+        }
+
+        .subtext a {
+            color: black;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .social-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .social-buttons button {
+            flex: 1;
+            background-color: #F7C740;
+            color: black;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px 0 50px 0;
+            padding: 15px 0;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+        }
+
+        .social-buttons button:hover {
+            background-color: #E0B838;
+        }
+
+     
+        .form-input {
+            margin-bottom: 20px;
+        }
+
+        .form-input input {
+            width: 93%;
+            padding: 10px 15px;
+            font-size: 14px;
+            border: 1px solid #CCCCCC;
+            border-radius: 8px;
+        }
+
+        .form-input input::placeholder {
+            color: #999;
+        }
+
+ 
+        .forgot-password {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .forgot-password a {
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+        }
+
+
+        .btn-login {
+            display: block;
+            width: 100%;
+            background-color: #F7C740;
+            border: none;
+            border-radius: 50px 0 50px 0;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: black;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .btn-login:hover {
+            background-color: #E0B838;
+        }
+
+        .register {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .register a {
+            color: black;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            position: relative;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .alert-success {
+            background-color: #4caf50; 
+        }
+        .alert-danger {
+            background-color: #f44336;
+        }
+        .alert-warning {
+            background-color: #ff9800; 
+        }
+
+        .back-button a,
+        .register a {
+          color: #f7c740; 
+          font-weight: bold;
+          text-decoration: none;
+          transition: color 0.3s ease;
+        }
+
+        .back-button a:hover,
+        .register a:hover {
+          color: #e0b838;
+          text-decoration: underline;
+        }
+       
+        footer {
+            background-color: #FBCE19;
+            padding: 20px 0;
+            text-align: center;
+            width: 100%;
+        }
+
+        footer p {
+            font-size: 14px;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px;
+                margin: 20px;
+            }
+
+            .social-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .form-input input {
+                padding: 12px;
+            }
+
+            .btn-login {
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .header-title {
+                font-size: 28px;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+
+            .social-buttons button {
+                font-size: 12px;
+            }
+
+            .form-input input {
+                font-size: 14px;
+            }
+
+            .btn-login {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo">
+            <img src="/static/img/asset/logo.png" alt="asass"> 
+        </div>
+        <div class="header-title">Forty Seven Laundry Pku</div>
+    </div>
+
+  
+    <div class="container">
+        
+        <div class="back-button">
+            <a href="/" class="back-button">Back to the main page</a>
+        </div>
+
+        
+        <h2>SIGN IN</h2>
+        <p class="subtext">Need an account? <a href="#">Join us now</a></p>
+
+        
+        <div class="social-buttons">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul>
+                    {% for category, message in messages %}
+                        <li class="alert alert-{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <form method="POST">
+            <div class="form-input">
+                <input type="email" placeholder="Enter your email" id="email" name="email" required>
+            </div>
+            <div class="form-input">
+                <input type="password" placeholder="Your Password" id="password" name="password" required>
+            </div>
+            
+            <button type="submit" class="btn-login">Login</button>
+        </form>
+        <p class="register">Don't have an account? <a href="/register" class="register">Register Now</a></p>
+
+    </div>
+
+  
+    <footer>
+        <p>&copy; 2023 Forty Seven Laundry | Powered by Ryzen</p>
+    </footer>
+</body>
+
+</html>

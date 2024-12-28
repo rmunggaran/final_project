@@ -8,212 +8,282 @@
       rel="stylesheet"
       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}" />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"></script>
 
     <title>{% block title %}{% endblock %}</title>
 
-    <link href="{{ url_for('static', filename='img/asset/logo.png') }}" rel="icon" />
+    <link
+      href="{{ url_for('static', filename='img/asset/logo.png') }}"
+      rel="icon" />
     <!-- icon -->
-    <link href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
+    <link
+      href="{{ url_for('static', filename='vendor/fontawesome-free/css/all.min.css') }}"
+      rel="stylesheet"
+      type="text/css" />
 
     <!-- Animasi -->
-    <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
+    <script
+      src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
+      type="module"></script>
     <style>
-      .text-custom{
+      .text-custom {
         color: #f9d71c;
       }
-      .form-group{
+      .form-group {
         margin-bottom: 1rem;
       }
     </style>
     <script>
       function editprofile(id) {
-          let name = $("#name").val(); 
-          let username = $("#username").val();
-          let email = $("#email").val();
-          let alamat = $("#alamat").val();
-          let no_telepon = $("#no_telepon").val();
-          let foto_profil = $('#foto_profil').prop("files")[0];
-  
-  
-          let formData = new FormData();
-  
-          formData.append('id', id);
-          formData.append('name', name);
-          formData.append('username', username);
-          formData.append('email', email);
-          formData.append('alamat', alamat);
-          formData.append('no_telepon', no_telepon);
-          formData.append('foto_profil', foto_profil); 
-  
-          $.ajax({
-              type: "POST",
-              url: "/editprofile",
-              data: formData,
-              processData: false,
-              contentType: false,
-              success: function (response) {
-                  if (response.status === "success") {
-                      $('#modalMessage').text(response.msg);
-                      $("#successModal").modal("show");
-                      $('#successModal').on('hidden.bs.modal', function () {
-                          window.location.reload();
-                      });
-                  } else if (response.status === "error") {
-                      $('#modalMessageE').text(response.msg);
-                      $("#errorModal").modal("show");
-                      $('#errorModal').on('hidden.bs.modal', function () {
-                          window.location.reload();
-                      });
-                  } else  {
-                      $('#modalMessageW').text(response.msg);
-                      $("#warningModal").modal("show");
-                      $('#warningModal').on('hidden.bs.modal', function () {
-                          window.location.reload();
-                      });
-                  }
-              },
-              error: function (xhr, status, error) {
-                  let errorMessage = xhr.responseJSON ? xhr.responseJSON.msg : 'Terjadi kesalahan';
-                  $('#modalMessageE').text(errorMessage);
-                  $("#errorModal").modal("show");
-              }
-          });
+        let name = $("#name").val();
+        let username = $("#username").val();
+        let email = $("#email").val();
+        let alamat = $("#alamat").val();
+        let no_telepon = $("#no_telepon").val();
+        let foto_profil = $("#foto_profil").prop("files")[0];
+
+        let formData = new FormData();
+
+        formData.append("id", id);
+        formData.append("name", name);
+        formData.append("username", username);
+        formData.append("email", email);
+        formData.append("alamat", alamat);
+        formData.append("no_telepon", no_telepon);
+        formData.append("foto_profil", foto_profil);
+
+        $.ajax({
+          type: "POST",
+          url: "/editprofile",
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (response) {
+            if (response.status === "success") {
+              $("#modalMessage").text(response.msg);
+              $("#successModal").modal("show");
+              $("#successModal").on("hidden.bs.modal", function () {
+                window.location.reload();
+              });
+            } else if (response.status === "error") {
+              $("#modalMessageE").text(response.msg);
+              $("#errorModal").modal("show");
+              $("#errorModal").on("hidden.bs.modal", function () {
+                window.location.reload();
+              });
+            } else {
+              $("#modalMessageW").text(response.msg);
+              $("#warningModal").modal("show");
+              $("#warningModal").on("hidden.bs.modal", function () {
+                window.location.reload();
+              });
+            }
+          },
+          error: function (xhr, status, error) {
+            let errorMessage = xhr.responseJSON
+              ? xhr.responseJSON.msg
+              : "Terjadi kesalahan";
+            $("#modalMessageE").text(errorMessage);
+            $("#errorModal").modal("show");
+          },
+        });
       }
-  
-      function change_password(id){
-          let current_password = $("#current_password").val();
-          let new_password = $("#new_password").val();
-          let new_password_confirmation = $("#new_password_confirmation").val();
-  
-          $.ajax({
-              type: "POST",
-              url: "/change_password",
-              data: {
-                  id:id,
-                  current_password:current_password,
-                  new_password:new_password,
-                  new_password_confirmation:new_password_confirmation
-              },
-              success: function (response) {
-                  if (response.status === "success") {
-                      $('#modalMessage').text(response.msg);
-                      $("#successModal").modal("show");
-                      $('#successModal').on('hidden.bs.modal', function () {
-                          window.location.reload();
-                      });
-                  } else if (response.status === "error") {
-                      $('#modalMessageE').text(response.msg);
-                      $("#errorModal").modal("show");
-                      $('#errorModal').on('hidden.bs.modal', function () {
-                          window.location.reload();
-                      });
-                  } else  {
-                      $('#modalMessageW').text(response.msg);
-                      $("#warningModal").modal("show");
-                      $('#warningModal').on('hidden.bs.modal', function () {
-                          window.location.reload();
-                      });
-                  }
-              },
-              error: function (xhr) {
-                  let errorMessage = xhr.responseJSON ? xhr.responseJSON.msg : 'Terjadi kesalahan';
-                  $('#modalMessageE').text(errorMessage);
-                  $("#errorModal").modal("show");
-              }
-          });
+
+      function change_password(id) {
+        let current_password = $("#current_password").val();
+        let new_password = $("#new_password").val();
+        let new_password_confirmation = $("#new_password_confirmation").val();
+
+        $.ajax({
+          type: "POST",
+          url: "/change_password",
+          data: {
+            id: id,
+            current_password: current_password,
+            new_password: new_password,
+            new_password_confirmation: new_password_confirmation,
+          },
+          success: function (response) {
+            if (response.status === "success") {
+              $("#modalMessage").text(response.msg);
+              $("#successModal").modal("show");
+              $("#successModal").on("hidden.bs.modal", function () {
+                window.location.reload();
+              });
+            } else if (response.status === "error") {
+              $("#modalMessageE").text(response.msg);
+              $("#errorModal").modal("show");
+              $("#errorModal").on("hidden.bs.modal", function () {
+                window.location.reload();
+              });
+            } else {
+              $("#modalMessageW").text(response.msg);
+              $("#warningModal").modal("show");
+              $("#warningModal").on("hidden.bs.modal", function () {
+                window.location.reload();
+              });
+            }
+          },
+          error: function (xhr) {
+            let errorMessage = xhr.responseJSON
+              ? xhr.responseJSON.msg
+              : "Terjadi kesalahan";
+            $("#modalMessageE").text(errorMessage);
+            $("#errorModal").modal("show");
+          },
+        });
       }
-  </script>
+
+      // Memicu input file ketika gambar diklik
+      function triggerFileInput() {
+        document.getElementById("foto_profil").click();
+      }
+
+      // Menampilkan pratinjau gambar setelah dipilih
+      function previewImage() {
+        const fileInput = document.getElementById("foto_profil");
+        const profilePicture = document.getElementById("profilePicture");
+
+        if (fileInput.files && fileInput.files[0]) {
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+            profilePicture.src = e.target.result;
+          };
+
+          reader.readAsDataURL(fileInput.files[0]);
+        }
+      }
+    </script>
   </head>
   <body>
-
     <!-- HEADER -->
     <header>
-      <nav id="navbar" class="navbar navbar-expand-lg navbar-light bg-transparent fixed-top">
+      <nav
+        id="navbar"
+        class="navbar navbar-expand-lg navbar-light bg-transparent fixed-top">
         <div class="container-fluid">
           <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="{{ url_for('static', filename='img/asset/logo.png') }}" 
-                 alt="Logo" 
-                 width="50" 
-                 height="50" 
-                 class="me-2">
+            <img
+              src="{{ url_for('static', filename='img/asset/logo.png') }}"
+              alt="Logo"
+              width="50"
+              height="50"
+              class="me-2" />
             <span class="fw-bold text-custom">Forty Seven Laundry</span>
           </a>
-          
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
               <li class="nav-item">
-                <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a>
+                <a
+                  class="nav-link {% if request.path == '/' %}active{% endif %}"
+                  href="/"
+                  >Home</a
+                >
               </li>
               <li class="nav-item">
-                <a class="nav-link {% if request.path == '/promo' %}active{% endif %}" href="/promo">Promo</a>
+                <a
+                  class="nav-link {% if request.path == '/promo' %}active{% endif %}"
+                  href="/promo"
+                  >Promo</a
+                >
               </li>
               <li class="nav-item">
-                <a class="nav-link {% if request.path == '/layanan' %}active{% endif %}" href="/layanan">Layanan</a>
+                <a
+                  class="nav-link {% if request.path == '/layanan' %}active{% endif %}"
+                  href="/layanan"
+                  >Layanan</a
+                >
               </li>
               <li class="nav-item">
-                <a class="nav-link {% if request.path == '/about' %}active{% endif %}" href="/about">About</a>
+                <a
+                  class="nav-link {% if request.path == '/about' %}active{% endif %}"
+                  href="/about"
+                  >About</a
+                >
               </li>
               <li class="nav-item">
-                <a class="nav-link {% if request.path == '/contact' %}active{% endif %}" href="/contact">Contact</a>
-              </li>              
+                <a
+                  class="nav-link {% if request.path == '/contact' %}active{% endif %}"
+                  href="/contact"
+                  >Contact</a
+                >
+              </li>
               {% if 'username' in session %}
               <li class="nav-item dropdown">
-                <a 
-                    class="nav-link dropdown-toggle d-flex align-items-center" 
-                    href="#" 
-                    id="navbarDropdown" 
-                    role="button" 
-                    data-bs-toggle="dropdown" 
-                    aria-expanded="false"
-                >
-                    {% if user.foto_profil %}
-                    <img 
-                        class="img-profile rounded-circle" 
-                        width="30" 
-                        height="30" 
-                        src="{{ url_for('static', filename='img/profile/' + user.foto_profil) }}"
-                        alt="User Profile Picture"
-                    >
-                    {% else %}
-                    <img 
-                        class="img-profile rounded-circle" 
-                        width="30" 
-                        height="30" 
-                        src="{{ url_for('static', filename='img/undraw_profile.svg') }}"
-                        alt="Default Profile Picture"
-                    >
-                    {% endif %}
-                    <span class="ms-2">{{ session['username'] }}</span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                  {% if session.get('role') == '1' %}
-                    <li>
-                        <a class="dropdown-item" href="/dashboard">
-                          <i class="fas fa-tachometer-alt"></i>  Dashboard
-                        </a>
-                    </li>
+                <a
+                  class="nav-link dropdown-toggle d-flex align-items-center"
+                  href="#"
+                  id="navbarDropdown"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false">
+                  {% if user.foto_profil %}
+                  <img
+                    class="img-profile rounded-circle"
+                    width="30"
+                    height="30"
+                    src="{{ url_for('static', filename='img/profile/' + user.foto_profil) }}"
+                    alt="User Profile Picture" />
                   {% else %}
-                    <li>
-                        <a class="dropdown-item" data-toggle="modal" data-target="#EditProfileModal{{ user._id }}">
-                          <i class="far fa-user-circle"></i> Edit Profile
-                        </a>
-                    </li> 
-                    <li>
-                        <a class="dropdown-item" data-toggle="modal" data-target="#GantiPModal{{ user._id }}">
-                          <i class="fas fa-key"></i> Ganti Password
-                        </a>
-                    </li> 
+                  <img
+                    class="img-profile rounded-circle"
+                    width="30"
+                    height="30"
+                    src="{{ url_for('static', filename='img/undraw_profile.svg') }}"
+                    alt="Default Profile Picture" />
                   {% endif %}
-                    <li>
-                        <a class="dropdown-item" href="/logout">
-                          <i class="fas fa-sign-out-alt"></i> Logout
-                        </a>
-                    </li>
+                  <span class="ms-2">{{ session['username'] }}</span>
+                </a>
+                <ul
+                  class="dropdown-menu dropdown-menu-end"
+                  aria-labelledby="navbarDropdown">
+                  {% if session.get('role') == '1' %}
+                  <li>
+                    <a class="dropdown-item" href="/dashboard">
+                      <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                  </li>
+                  {% else %}
+                  <li>
+                    <a
+                      class="dropdown-item"
+                      data-toggle="modal"
+                      data-target="#EditProfileModal{{ user._id }}">
+                      <i class="far fa-user-circle"></i> Edit Profile
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      class="dropdown-item"
+                      data-toggle="modal"
+                      data-target="#GantiPModal{{ user._id }}">
+                      <i class="fas fa-key"></i> Ganti Password
+                    </a>
+                  </li>
+                  {% endif %}
+                  <li>
+                    <a class="dropdown-item" href="/logout">
+                      <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                  </li>
                 </ul>
               </li>
               {% else %}
@@ -226,9 +296,7 @@
         </div>
       </nav>
 
-      <div class="container text-center">
-        {% block header %}{% endblock %}
-      </div>
+      <div class="container text-center">{% block header %}{% endblock %}</div>
     </header>
 
     {% block content %} {% endblock %}
@@ -237,7 +305,11 @@
     <section id="slogan" class="text-center mt-5">
       <div class="container">
         <h2>Bersih, Rapih, Terpercaya</h2>
-        <p>Kami hadir sebagai solusi untuk menjaga kebersihan dan kenyamanan Anda. Dengan perawatan yang teliti, pakaian akan tetap segar, bersih, dan nyaman dipakai, seolah selalu baru setiap kali dikenakan</p>
+        <p>
+          Kami hadir sebagai solusi untuk menjaga kebersihan dan kenyamanan
+          Anda. Dengan perawatan yang teliti, pakaian akan tetap segar, bersih,
+          dan nyaman dipakai, seolah selalu baru setiap kali dikenakan
+        </p>
         <a href="/contact" class="btn btn-warning">Hubungi Kami</a>
       </div>
     </section>
@@ -265,27 +337,69 @@
             <div class="col-md-4">
               <h5>Buka Setiap Hari:</h5>
               {% if contact %}
-                <p>{{ contact.hari_buka.dari }} – {{ contact.hari_buka.sampai }}: {{ contact.jam_buka.dari }}-{{ contact.jam_buka.sampai }}</p>
+              <p>
+                {{ contact.hari_buka.dari }} – {{ contact.hari_buka.sampai }}:
+                {{ contact.jam_buka.dari }}-{{ contact.jam_buka.sampai }}
+              </p>
               {% else %}
-                <p>Tidak ada data</p>
+              <p>Tidak ada data</p>
               {% endif %}
             </div>
 
             <div class="col-md-2">
               <h5>Our Company</h5>
               <ul class="list-unstyled">
-                <li><a href="/" class="text-dark text-decoration-none">Home</a></li>
-                <li><a href="/promo" class="text-dark text-decoration-none">Promo</a></li>
-                <li><a href="/layanan" class="text-dark text-decoration-none">Layanan</a></li>
-                <li><a href="/contact" class="text-dark text-decoration-none">Contact</a></li>
+                <li>
+                  <a href="/" class="text-dark text-decoration-none">Home</a>
+                </li>
+                <li>
+                  <a href="/promo" class="text-dark text-decoration-none"
+                    >Promo</a
+                  >
+                </li>
+                <li>
+                  <a href="/layanan" class="text-dark text-decoration-none"
+                    >Layanan</a
+                  >
+                </li>
+                <li>
+                  <a href="/contact" class="text-dark text-decoration-none"
+                    >Contact</a
+                  >
+                </li>
               </ul>
             </div>
 
             <div class="col-md-2 text-center">
               <h5>Follow Us:</h5>
-              <a href="{% if contact.social_media.instagram %}{{ contact.social_media.instagram }}{% else %}#{% endif %}" target="_blank"><img src="/static/img/asset/instagram.png" alt="Instagram" width="30"/></a>
-              <a href="{% if contact.social_media.tiktok %}{{ contact.social_media.tiktok }}{% else %}#{% endif %}" target="_blank"><img src="/static/img/asset/tiktok.png" alt="TikTok" width="30"/></a>
-              <a href="{% if contact.nomor %}https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan{% else %}#{% endif %}" target="_blank"><img src="/static/img/asset/whatsapp.png" alt="Whatsapp" width="30"/></a>
+              {% if contact is not none %}
+              <a
+                href="{% if contact.social_media.instagram %}{{ contact.social_media.instagram }}{% else %}#{% endif %}"
+                target="_blank"
+                ><img
+                  src="/static/img/asset/instagram.png"
+                  alt="Instagram"
+                  width="30"
+              /></a>
+              <a
+                href="{% if contact.social_media.tiktok %}{{ contact.social_media.tiktok }}{% else %}#{% endif %}"
+                target="_blank"
+                ><img
+                  src="/static/img/asset/tiktok.png"
+                  alt="TikTok"
+                  width="30"
+              /></a>
+              <a
+                href="{% if contact.nomor %}https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan{% else %}#{% endif %}"
+                target="_blank"
+                ><img
+                  src="/static/img/asset/whatsapp.png"
+                  alt="Whatsapp"
+                  width="30"
+              /></a>
+              {% else %}
+              <p>Data kontak belum tersedia.</p>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -299,128 +413,178 @@
     </footer>
 
     <!-- Modal -->
-    <div class="modal fade" id="EditProfileModal{{ user._id }}" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="EditProfileModal{{ user._id }}"
+      tabindex="-1"
+      aria-labelledby="responseModalLabel"
+      aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="fw-bold">Edit Profile</h5>
-            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-dismiss="modal"
+              aria-label="Close"></button>
           </div>
           <div class="modal-body row">
+            <div
+              class="form-group d-flex flex-column justify-content-center align-items-center">
+              {% if user.foto_profil %}
+              <img
+                class="img-fluid rounded-circle"
+                style="height: 5rem; cursor: pointer"
+                id="profilePicture"
+                src="{{ url_for('static', filename='img/profile/' + user.foto_profil) }}"
+                onclick="triggerFileInput()" />
+              {% else %}
+              <img
+                class="img-fluid rounded-circle"
+                style="height: 5rem; cursor: pointer"
+                id="profilePicture"
+                src="{{ url_for('static', filename='img/undraw_profile.svg') }}"
+                onclick="triggerFileInput()" />
+              {% endif %}
+              <p class="text-muted mt-2" style="font-size: 0.9rem">
+                Klik gambar untuk mengganti foto profil
+              </p>
+            </div>
+            <input
+              type="file"
+              class="form-control"
+              name="foto_profil"
+              id="foto_profil"
+              style="display: none"
+              onchange="previewImage()" />
+
             <div class="form-group">
-              <input type="text" class="form-control form-control-user" name="name" id="name"
-                  placeholder="Ujang jamaludin" value="{{ user.name }}" required>
-              </div>
-              <div class="form-group">
-                  <input type="text" class="form-control form-control-user" name="username" id="username"
-                      placeholder="Ujang jamaludin" value="{{ user.username }}" required>
-              </div>
-              <div class="form-group">
-                  <input type="email" class="form-control form-control-user" name="username" id="email"
-                      placeholder="Ujang jamaludin" value="{{ user.email }}" required>
-              </div>
-              <div class="form-group">
-                  <input type="text" class="form-control form-control-user" name="alamat" id="alamat"
-                      placeholder="Alamat lengkap" value="{{ user.alamat }}" required>
-              </div>
-              <div class="form-group">
-                  <input type="number" class="form-control form-control-user" name="no_telepon" id="no_telepon"
-                      placeholder="089993899389" value="{{ user.tlp }}" required>
-              </div>
-              <div class="form-group">
-                  <input type="file" class="form-control form-control-user" name="foto_profil" id="foto_profil">
-              </div>
-              <div class="form-group">
-                <button type="submit" class="btn btn-costum" data-dismiss="modal" onclick="editprofile('{{ user._id }}')" >
-                    Edit
-                </button>
-              </div>
+              <input
+                type="text"
+                class="form-control form-control-user"
+                name="name"
+                id="name"
+                placeholder="Ujang jamaludin"
+                value="{{ user.name }}"
+                required />
+            </div>
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-control form-control-user"
+                name="username"
+                id="username"
+                placeholder="Ujang jamaludin"
+                value="{{ user.username }}"
+                required />
+            </div>
+            <div class="form-group">
+              <input
+                type="email"
+                class="form-control form-control-user"
+                name="username"
+                id="email"
+                placeholder="Ujang jamaludin"
+                value="{{ user.email }}"
+                required />
+            </div>
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-control form-control-user"
+                name="alamat"
+                id="alamat"
+                placeholder="Alamat lengkap"
+                value="{{ user.alamat }}"
+                required />
+            </div>
+            <div class="form-group">
+              <input
+                type="number"
+                class="form-control form-control-user"
+                name="no_telepon"
+                id="no_telepon"
+                placeholder="089993899389"
+                value="{{ user.nomor }}"
+                required />
+            </div>
+            <div class="form-group">
+              <button
+                type="submit"
+                class="btn btn-costum"
+                data-dismiss="modal"
+                onclick="editprofile('{{ user._id }}')">
+                Edit
+              </button>
+            </div>
           </div>
         </div>
       </div>
-  </div>
+    </div>
 
     <!-- Modal Ganti password-->
-    <div class="modal fade" id="GantiPModal{{ user._id }}" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="GantiPModal{{ user._id }}"
+      tabindex="-1"
+      aria-labelledby="responseModalLabel"
+      aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="fw-bold">Edit Profile</h5>
-            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-dismiss="modal"
+              aria-label="Close"></button>
           </div>
           <div class="modal-body row">
             <div class="form-group">
               <div class="form-group">
-                <input type="password" class="form-control " id="current_password"
-                    name="current_password" placeholder="Masukan password lama" required>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="current_password"
+                  name="current_password"
+                  placeholder="Masukan password lama"
+                  required />
               </div>
               <div class="form-group">
-                  <input type="password" class="form-control " id="new_password" name="new_password"
-                      placeholder="Masukan password baru" required>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="new_password"
+                  name="new_password"
+                  placeholder="Masukan password baru"
+                  required />
               </div>
               <div class="form-group">
-                  <input type="password" class="form-control " id="new_password_confirmation"
-                      name="new_password_confirmation" placeholder="Konfirmasi password baru" required>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="new_password_confirmation"
+                  name="new_password_confirmation"
+                  placeholder="Konfirmasi password baru"
+                  required />
               </div>
               <div class="form-group">
-                <button type="submit" class="btn btn-costum" data-dismiss="modal" onclick="change_password('{{ user._id }}')">Ganti password</button>
+                <button
+                  type="submit"
+                  class="btn btn-costum"
+                  data-dismiss="modal"
+                  onclick="change_password('{{ user._id }}')">
+                  Ganti password
+                </button>
               </div>
+            </div>
           </div>
         </div>
       </div>
-  </div>
-  </div>
+    </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-body row">
-              <div class="col-12 d-flex justify-content-center">
-                  <dotlottie-player src="https://lottie.host/2a5138ae-5a9f-41cf-ba78-b51c7d14accd/3xYrsCV0Ya.json" background="transparent" speed="1" style="width: 200px; height: 200px" direction="1" playMode="normal" loop autoplay></dotlottie-player>
-              </div>
-              <div class="col text-center">
-                  <!-- Pesan dari server -->
-                  <p id="modalMessage"></p>
-              </div>
-          </div>
-        </div>
-      </div>
-  </div>
-
-  <!-- Modal -->
-  <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-body row">
-              <div class="col-12 d-flex justify-content-center">
-                  <dotlottie-player src="https://lottie.host/e2844399-9b7f-445f-b1cb-a0c276a52d3c/8C2joS4JAA.json" background="transparent" speed="1" style="width: 200px; height: 200px" direction="1" playMode="normal" loop autoplay></dotlottie-player>
-              </div>
-              <div class="col text-center">
-                  <!-- Pesan dari server -->
-                  <p id="modalMessageE"></p>
-              </div>
-          </div>
-        </div>
-      </div>
-  </div>
-
-  <!-- Modal -->
-  <div class="modal fade" id="warningModal" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-body row">
-              <div class="col-12 d-flex justify-content-center">
-                  <dotlottie-player src="https://lottie.host/a9965936-0f43-4150-8d94-88b109d3b53a/aXmXxc8G1g.json" background="transparent" speed="1" style="width: 200px; height: 200px" direction="1" playMode="normal" loop autoplay></dotlottie-player>
-              </div>
-              <div class="col text-center">
-                  <!-- Pesan dari server -->
-                  <p id="modalMessageW"></p>
-              </div>
-          </div>
-        </div>
-      </div>
-  </div>
+    {% include 'modal_SEW.html' %}
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
@@ -434,7 +598,6 @@
         });
       });
     </script>
-    
 
     <!-- Bootstrap core JavaScript-->
     <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>

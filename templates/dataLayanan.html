@@ -176,6 +176,33 @@
         background-color: #e9ecef;
         border-color: #f9d71c;
     }
+    .modal .price {
+      color: #f9d71c;
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .modal .duration {
+      font-size: 16px;
+      color: #777;
+      margin-bottom: 15px;
+    }
+    
+    .modal .btn {
+      background-color: #f9d71c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    
+    .modal .btn:hover {
+      background-color: #e6c100;
+    }
 </style>
 
     <!-- Page Heading -->
@@ -219,7 +246,7 @@
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>no</th>
+                                        <th>Foto</th>
                                         <th>Judul</th>
                                         <th>Harga</th>
                                         <th>Deskripsi</th>
@@ -229,13 +256,20 @@
                                 <tbody>
                                     {% for dt in data %}
                                         <tr>
-                                            <td class="col-1">{{ loop.index }}</td>
+                                            <td class="col-1">
+                                                {% if dt.foto %}
+                                                <img class="img-fluid " src="{{ url_for('static', filename='img/layanan/' + dt.foto) }}">
+                                                {% else %}
+                                                <img class="img-fluid rounded-circle " src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
+                                                {% endif %}
+                                            </td>
                                             <td class="col-2">{{ dt.judul }}</td>
                                             <td class="col-2">Rp {{ dt.harga | format_rupiah }}/kg</td>
                                             <td>{{ dt.deskripsi | limit_taxt(20) | safe }}</td>
                                             <td class="col-2">
-                                                <a href="/layanan" class="btn btn-primary mb-1"
-                                                    title="Lihat Detail"><i class="fas fa-fw fa-eye"></i> Detail</a>
+                                                <a href="" class="btn btn-primary mb-1"
+                                                    title="Lihat Detail" data-toggle="modal"
+                                                    data-target="#datailLayananModal{{ dt._id }}"><i class="fas fa-fw fa-eye"></i> Detail</a>
                                                 <a href="#" class="btn btn-warning mb-1"
                                                     title="Edit" data-toggle="modal" data-target="#editLayananModal{{ dt._id }}"><i class="fas fa-fw fa-pen"></i> Edit</a>
                                                 <a href="#" class="btn btn-danger mb-1"
@@ -296,6 +330,49 @@
                                             </div>
                                         </div>
 
+                                        <!-- Modal -->
+                                          <div
+                                          class="modal fade"
+                                          id="datailLayananModal{{ dt._id }}"
+                                          tabindex="-1"
+                                          aria-labelledby="responseModalLabel"
+                                          aria-hidden="true">
+                                          <div
+                                            class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                                            <div class="modal-content">
+                                              <div class="modal-body row">
+                                                <div class="col-12 col-sm-4">
+                                                  {% if dt.foto %}
+                                                  <img
+                                                    class="img-fluid"
+                                                    src="{{ url_for('static', filename='img/layanan/' + dt.foto) }}" />
+                                                  {% else %}
+                                                  <img
+                                                    class="img-fluid"
+                                                    src="{{ url_for('static', filename='img/undraw_profile.svg') }}" />
+                                                  {% endif %}
+                                                </div>
+                                                <div class="col">
+                                                  <div class="row mt-3 ms-2">
+                                                    <div class="col-10">
+                                                      <h4>{{ dt.judul }}</h4>
+                                                      <p class="price">Rp {{ dt.harga | format_rupiah }}/kg</p>
+                                                      <p class="duration">{{ dt.wp }}</p>
+                                                    </div>
+                                                    <div class="col">
+                                                      <button
+                                                        type="button"
+                                                        class="btn-close"
+                                                        data-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                    </div>
+                                                  </div>
+                                                  <p>{{ dt.deskripsi | safe }}</p>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
 
                                         <!-- Modal -->
                                         <div class="modal fade" id="hapusModal{{ dt._id }}" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">

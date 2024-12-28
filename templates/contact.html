@@ -87,9 +87,13 @@
               </div>
               <h5>Ikuti Kami:</h5>
               <div class="social-icons">
+                {% if contact is not none %}
                 <a href="{% if contact.social_media.instagram %}{{ contact.social_media.instagram }}{% else %}#{% endif %}" target="_blank"><img src="/static/img/asset/instagram.png" alt="Instagram" /></a>
                 <a href="{% if contact.social_media.tiktok %}{{ contact.social_media.tiktok }}{% else %}#{% endif %}" target="_blank"><img src="/static/img/asset/tiktok.png" alt="TikTok" /></a>
                 <a href="{% if contact.nomor %}https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan{% else %}#{% endif %}" target="_blank"><img src="/static/img/asset/whatsapp.png" alt="Whatsapp" /></a>
+                {% else %}
+                    <p>Data kontak belum tersedia.</p>
+                {% endif %}
               </div>
             </div>
           </div>

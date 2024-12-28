@@ -6,7 +6,8 @@ from datetime import datetime
 from flask_paginate import Pagination
 from bs4 import BeautifulSoup
 import os
-import re
+import requests
+import random
 
 from os.path import join, dirname
 from dotenv import load_dotenv
@@ -79,8 +80,8 @@ def format_phone(number):
 def home():
     user = None
     rating_status = None
-    if 'username' in session:
-        user = users_collection.find_one({"username": session['username']})
+    if 'id' in session:
+        user = users_collection.find_one({"_id": ObjectId(session['id'])})
         user_id = user['_id']
         rating_status = rating_collection.find_one({"id_user": str(user_id)})
     return render_template(
@@ -97,8 +98,8 @@ def home():
 @app.route('/promo')
 def promo():
     user = None
-    if 'username' in session:
-        user = users_collection.find_one({"username": session['username']})
+    if 'id' in session:
+        user = users_collection.find_one({"_id": ObjectId(session['id'])})
 
     page = request.args.get('page', 1, type=int)  
     per_page = 6
@@ -119,8 +120,8 @@ def promo():
 @app.route('/layanan')
 def layanan():
     user = None
-    if 'username' in session:
-        user = users_collection.find_one({"username": session['username']})
+    if 'id' in session:
+        user = users_collection.find_one({"_id": ObjectId(session['id'])})
     return render_template(
         'layanan.html',
         user = user,
@@ -136,8 +137,8 @@ def layanan():
 @app.route('/about')
 def about():
     user = None
-    if 'username' in session:
-        user = users_collection.find_one({"username": session['username']})
+    if 'id' in session:
+        user = users_collection.find_one({"_id": ObjectId(session['id'])})
     return render_template(
         'about.html',
         user = user,
@@ -148,8 +149,8 @@ def about():
 @app.route('/contact')
 def contact():
     user = None
-    if 'username' in session:
-        user = users_collection.find_one({"username": session['username']})
+    if 'id' in session:
+        user = users_collection.find_one({"_id": ObjectId(session['id'])})
     return render_template(
         'contact.html',
         user = user,
@@ -167,12 +168,24 @@ def tambahrating():
         review = request.form.get('review')
         rating = request.form.get('rating')
 
-        rating_data = {
-            'id_user': id_user,
-            'name': name,
-            'review': review,
-            'rating': rating
-        }
+        user = users_collection.find_one({"_id": ObjectId(id_user)})
+        foto = user['foto_profil']
+
+        if not foto:
+            rating_data = {
+                'id_user': id_user,
+                'name': name,
+                'review': review,
+                'rating': rating
+            }
+        else:
+            rating_data = {
+                'id_user': id_user,
+                'name': name,
+                'review': review,
+                'rating': rating,
+                'foto_user': foto
+            }
 
         result = rating_collection.insert_one(rating_data)
         if result.inserted_id:
@@ -246,48 +259,189 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
-        try :
-            name = request.form.get('name')
-            username = request.form.get('username')
-            email = request.form.get('email')
-            alamat = request.form.get('alamat')
-            nomor = request.form.get('nomor')
-            password = request.form.get('password')
-            confirm_password = request.form.get('confirm_password')
-            role = request.form.get('role')
-
-            if password != confirm_password:
-                return jsonify({'status': 'error', 'msg': 'Passwords do not match!'})
-            
-            existing_email = users_collection.find_one({'email': email})
-            if existing_email:
-                return jsonify({'status': 'error', 'msg': 'Email telah digunakan!'})
-
-            existing_nomor = users_collection.find_one({'nomor': nomor})
-            if existing_nomor:
-                return jsonify({'status': 'error', 'msg': 'Nomor telah digunakan!'})
-
-            hashed_password = generate_password_hash(password)
-
-            user_data = {
-                'name': name,
-                'username': username,
-                'email': email,
-                'alamat': alamat,
-                'tlp': nomor,
-                'password': hashed_password,
-                'role': role
-            }
-            result = users_collection.insert_one(user_data)
-            if result.inserted_id:
-                return jsonify({'status': 'success', 'msg': 'Berhasil melakukan register silah login'})
-            else:
-                return jsonify({'status': 'warning', 'msg': 'Register gagal, segera hubungi admin terkait.'})
-        except Exception as e:
-            return jsonify({'status': 'error', 'msg': f'Error: {e}'})
-    
     return render_template('register.html')
+
+# API Key dari Fonnte
+FONNTE_API_KEY = "gmxGiDzJTDDH8871nVSY"  # Ganti dengan API Key Anda
+FONNTE_API_URL = "https://api.fonnte.com/send"
+
+# Simpan OTP sementara untuk validasi
+otp_store = {}
+
+@app.route('/send_otp', methods=['POST'])
+def send_otp():
+    try:
+        data = request.json
+        phone_number = data.get('nomor')
+
+        if not phone_number:
+            return jsonify({"status": "error", "msg": "Nomor telepon tidak boleh kosong!"})
+
+        # Generate OTP 6 digits
+        otp = random.randint(100000, 999999)
+
+        # Simpan OTP sementara di memori (atau gunakan Redis untuk produksi)
+        otp_store[phone_number] = otp
+
+        # Kirim pesan OTP ke nomor menggunakan Fonnte
+        headers = {"Authorization": FONNTE_API_KEY}  # Ganti dengan API key Fonnte
+        payload = {
+            "target": phone_number,
+            "message": f"Kode OTP Anda adalah {otp}. Jangan bagikan kepada siapa pun.",
+        }
+        response = requests.post(FONNTE_API_URL, headers=headers, data=payload)
+
+        if response.status_code == 200:
+            return jsonify({"status": "success", "msg": "OTP berhasil dikirim!"})
+        else:
+            return jsonify({"status": "error", "msg": "Gagal mengirim OTP!"}), 500
+    except Exception as e:
+        return jsonify({"status": "error", "msg": f"Error: {str(e)}"})
+
+@app.route('/validate_otp', methods=['GET','POST'])
+def validate_otp():
+    if request.method == 'GET':
+        nomor = request.args.get('nomor')
+        return render_template('otp.html', nomor=nomor, title = 'register')
+    
+    if request.method == 'POST':
+        try:
+            data = request.json
+            phone_number = data.get('nomor')
+            otp_input = data.get('otp')
+            user_data = data.get('user_data')  # Data pengguna yang dikirim dari frontend
+
+            if not phone_number or not otp_input:
+                return jsonify({"status": "error", "msg": "Nomor telepon dan OTP wajib diisi!"})
+
+            # Validasi OTP
+            stored_otp = otp_store.get(phone_number)
+            if stored_otp and str(stored_otp) == str(otp_input):
+                # Hash password sebelum menyimpan
+                user_data['password'] = generate_password_hash(user_data['password'])
+
+                # Simpan data pengguna ke database
+                result = users_collection.insert_one(user_data)
+                if result.inserted_id:
+                    del otp_store[phone_number]  # Hapus OTP setelah berhasil
+                    return jsonify({"status": "success", "msg": "Registrasi berhasil!"})
+                else:
+                    return jsonify({"status": "error", "msg": "Gagal menyimpan data pengguna."})
+            else:
+                return jsonify({"status": "error", "msg": "OTP tidak valid!"})
+        except Exception as e:
+            return jsonify({"status": "error", "msg": f"Error: {str(e)}"})
+
+@app.route('/check_nomor_email', methods=['POST'])
+def check_nomor_email():
+    try:
+        data = request.get_json()
+        nomor = data.get('nomor')
+        email = data.get('email')
+
+        if not nomor or not email:
+            return jsonify({'status': 'error', 'msg': 'Nomor telepon dan email tidak boleh kosong.'})
+
+        # Cek apakah nomor sudah ada di database
+        existing_nomor = users_collection.find_one({'nomor': nomor})
+        if existing_nomor:
+            return jsonify({'status': 'error', 'msg': 'Nomor telepon sudah digunakan.'})
+
+        # Cek apakah email sudah ada di database
+        existing_email = users_collection.find_one({'email': email})
+        if existing_email:
+            return jsonify({'status': 'error', 'msg': 'Email sudah digunakan.'})
+
+        return jsonify({'status': 'success', 'msg': 'Nomor telepon dan email valid.'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'msg': f'Terjadi kesalahan: {e}'})
+    
+@app.route('/forgot_password', methods=['GET'])
+def forgot_password():
+    return render_template('forgot_password.html')
+
+@app.route('/send_otp_forgot', methods=['POST'])
+def send_otp_forgot():
+    try:
+        data = request.json
+        phone_number = data.get('nomor')
+
+        user = users_collection.find_one({'nomor': phone_number})
+        if not user:
+            return jsonify({'status': 'error', 'msg': 'Nomor tidak ditemukan!'})
+
+        # Generate OTP 6 digits
+        otp = random.randint(100000, 999999)
+
+        # Simpan OTP sementara di memori (atau gunakan Redis untuk produksi)
+        otp_store[phone_number] = otp
+
+        # Kirim pesan OTP ke nomor menggunakan Fonnte
+        headers = {"Authorization": FONNTE_API_KEY}  # Ganti dengan API key Fonnte
+        payload = {
+            "target": phone_number,
+            "message": f"Kode OTP Anda adalah {otp}. Jangan bagikan kepada siapa pun.",
+        }
+        response = requests.post(FONNTE_API_URL, headers=headers, data=payload)
+
+        if response.status_code == 200:
+            return jsonify({"status": "success", "msg": "OTP berhasil dikirim!"})
+        else:
+            return jsonify({"status": "error", "msg": "Gagal mengirim OTP!"}), 500
+    except Exception as e:
+        return jsonify({"status": "error", "msg": f"Error: {str(e)}"})
+
+@app.route('/validate_otp_forgot', methods=['GET','POST'])
+def validate_otp_forgot():
+    if request.method == 'GET':
+        nomor = request.args.get('nomor')
+        return render_template('otp.html', nomor=nomor, title = 'forgot')
+    
+    if request.method == 'POST':
+        try:
+            data = request.json
+            phone_number = data.get('nomor')
+            otp_input = data.get('otp')
+
+            if not phone_number or not otp_input:
+                return jsonify({"status": "error", "msg": "Nomor telepon dan OTP wajib diisi!"})
+
+            stored_otp = otp_store.get(phone_number)
+            if stored_otp and str(stored_otp) == str(otp_input):
+                return jsonify({"status": "success", "msg": "Verifikasi berhasil!"})
+            else:
+                return jsonify({"status": "error", "msg": "OTP tidak valid!"})
+        except Exception as e:
+            return jsonify({"status": "error", "msg": f"Error: {str(e)}"})
+        
+@app.route('/reset_password', methods=['POST','GET'])
+def reset_password():
+    if request.method == 'GET':
+        nomor = request.args.get('nomor')
+        return render_template('reset_password.html', nomor=nomor)
+    
+    if request.method == 'POST':
+        nomor = request.form.get('nomor')
+        
+        new_password = request.form.get('new_password')
+        new_password_confirmation = request.form.get('new_password_confirmation')
+
+        if new_password != new_password_confirmation:
+            return jsonify({'status': 'warning', 'msg': f'Password baru dan konfirmasi password tidak cocok.'})
+
+        if len(new_password) < 6:
+            return jsonify({'status': 'warning', 'msg': f'Password baru harus lebih dari 6 karakter.'})
+
+        hashed_password = generate_password_hash(new_password)
+        result = users_collection.update_one(
+            {"nomor": nomor},
+            {"$set": {"password": hashed_password}}
+        )
+        if result.modified_count > 0:
+            return jsonify({'status': 'success', 'msg': 'Reset Password berhasil diganti.'})
+        else:
+            return jsonify({'status': 'error', 'msg': f'Error: Terjadi kesalahan, password tidak dapat diubah.'})
+  
 
 @app.route('/logout')
 def logout():
@@ -298,6 +452,7 @@ def logout():
     else:
         flash('Harap login terlebih dahulu!', 'warning')
         return redirect(url_for('login'))
+    
 # ================ End Login ====================
 
 
@@ -431,6 +586,30 @@ def update_role():
             return jsonify({'status': 'success', 'msg': 'Role berhasil diperbarui.'})
         else:
             return jsonify({'status': 'warning', 'msg': 'Role tidak berubah atau pengguna tidak ditemukan.'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'msg': f'Error: {str(e)}'})
+
+@app.route('/hapus_user', methods=['POST'])
+def hapus_user():
+    try:
+        id = request.form.get('id')
+        users = users_collection.find_one({'_id': ObjectId(id)})
+        
+        if not users:
+            return jsonify({'status': 'warning', 'msg': 'Data User tidak ditemukan.'})
+        
+        foto = users.get('foto')
+        if foto:
+            foto_path = os.path.join('static', 'img', 'profile', foto)
+            if os.path.exists(foto_path):
+                os.remove(foto_path) 
+
+        result = users_collection.delete_one({'_id': ObjectId(id)})
+
+        if result.deleted_count > 0:
+            return jsonify({'status': 'success', 'msg': 'User berhasil dihapus beserta file foto.'})
+        else:
+            return jsonify({'status': 'warning', 'msg': 'Gagal menghapus user.'})
     except Exception as e:
         return jsonify({'status': 'error', 'msg': f'Error: {str(e)}'})
 

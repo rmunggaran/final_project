@@ -194,9 +194,9 @@
                 <img class="card-img-to" src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
                 {% endif %}
                 <div class="card-body">
-                    <h4 class="text-center">{{ pro.judul }}</h4>
+                    <h4 class="text-center">{{ pro.judul | limit_taxt(4) }}</h4>
                     <p class="text-center" style="color: #fbce19;">Berlaku sampai : {{ pro.tanggal_berakhir | format_date }}</p>
-                    <p>{{ pro.deskripsi | limit_taxt(10) | safe }}</p>
+                    <p>{{ pro.deskripsi | remove_html | limit_taxt(10) }}</p>
                     <div class="text-center">
                         {% if contact.nomor %}
                             <a href="https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan" class="btn btn-secondary text">Pesan Sekarang</a>
@@ -230,7 +230,7 @@
                                   <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                               </div>
                           </div>
-                          <p>{{ pro.deskripsi | remove_html | limit_taxt(10) }}</p>
+                          <p>{{ pro.deskripsi | safe }}</p>
                         <div class="">
                             {% if contact.nomor %}
                                 <a href="https://wa.me/62{{ contact.nomor }}?text=Halo%20Forty%20Seven%20Laundry,%20saya%20mau%20pesan%20layanan" target="_blank" class="btn btn-secondary text ms-3">Pesan Sekarang</a>
@@ -255,21 +255,6 @@
           </div>
         </div>
       </div>
-  
-      <!-- LAYANAN -->
-      <section id="services">
-        <h2>Layanan Laundry Forty Seven</h2>
-        <div class="service-items">
-          <img src="/static/img/asset/1.jpg" alt="1" />
-          <img src="/static/img/asset/2.jpg" alt="2" />
-          <img src="/static/img/asset/3.jpg" alt="3" />
-          <img src="/static/img/asset/4.jpg" alt="4" />
-          <img src="/static/img/asset/5.jpg" alt="5" />
-          <img src="/static/img/asset/6.jpg" alt="6" />
-          <img src="/static/img/asset/7.jpg" alt="7" />
-          <img src="/static/img/asset/8.jpg" alt="8" />
-        </div>
-      </section>
   
       <!-- MENGAPA HARUS KAMI -->
       <section id="why-us">
@@ -313,13 +298,11 @@
                   <div class="card mx-2 shadow-sm" style="max-width: 300px;">
                     <div class="card-body text-center">
                       <div class="profile-circle mb-3">
-                        <img
-                          src="/static/img/asset/profile2.png"
-                          alt="Rifqi Aini"
-                          class="rounded-circle"
-                          width="80"
-                          height="80"
-                        />
+                        {% if rating['foto_user'] %}
+                        <img class="img-fluid rounded-circle" width="80" height="80" src="{{ url_for('static', filename='img/profile/' + rating['foto_user']) }}">
+                        {% else %}
+                        <img class="img-fluid rounded-circle" width="80" height="80" src="{{ url_for('static', filename='img/asset/profile2.png') }}">
+                        {% endif %}
                       </div>
                       <p>"{{ rating['review'] }}"</p>
                       <div class="rating mb-2">
@@ -341,7 +324,8 @@
                   {% endfor %}
                 </div>
               </div>
-              <!-- Slide kedua (tambahkan lebih banyak card jika perlu) -->
+              <!-- Slide kedua -->
+              {% if rating_data2 %}
               <div class="carousel-item">
                 <div class="d-flex justify-content-center">
                   <!-- Card Testimoni 4 -->
@@ -349,13 +333,11 @@
                   <div class="card mx-2 shadow-sm" style="max-width: 300px;">
                     <div class="card-body text-center">
                       <div class="profile-circle mb-3">
-                        <img
-                          src="/static/img/asset/profile.png"
-                          alt="User Testimoni 4"
-                          class="rounded-circle"
-                          width="80"
-                          height="80"
-                        />
+                        {% if rating['foto_user'] %}
+                        <img class="img-fluid rounded-circle" width="80" height="80" src="{{ url_for('static', filename='img/profile/' + rating['foto_user']) }}">
+                        {% else %}
+                        <img class="img-fluid rounded-circle" width="80" height="80" src="{{ url_for('static', filename='img/asset/profile2.png') }}">
+                        {% endif %}
                       </div>
                       <p>"{{ rating['review'] }}"</p>
                       <div class="rating mb-2">
@@ -377,6 +359,7 @@
                   {% endfor %}
                 </div>
               </div>
+              {% endif %}
             </div>
           
             <!-- Tombol Navigasi Carousel -->
@@ -404,7 +387,7 @@
 
 
 
-{% if 'username' in session %}
+{% if 'id' in session %}
     <div class="container my-5 text-center">
       {% if rating_status %}
       <button type="button" class="btn btn-secondary w-100" data-bs-toggle="modal" data-bs-target="#ratingModal">

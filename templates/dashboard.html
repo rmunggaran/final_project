@@ -135,6 +135,43 @@
             });
         });
     }
+
+    function hapus_user(id) {
+            console.log("deleting", id)
+            $.ajax({
+                type: "POST",
+                url: "/hapus_user",
+                data: {
+                    id: id
+                },
+                success: function (response) {
+                    if (response.status === "success") {
+                        $('#modalMessage').text(response.msg);
+                        $("#successModal").modal("show");
+                        $('#successModal').on('hidden.bs.modal', function () {
+                            window.location.reload();
+                        });
+                    } else if (response.status === "error") {
+                        $('#modalMessageE').text(response.msg);
+                        $("#errorModal").modal("show");
+                        $('#errorModal').on('hidden.bs.modal', function () {
+                            window.location.reload();
+                        });
+                    } else  {
+                        $('#modalMessageW').text(response.msg);
+                        $("#warningModal").modal("show");
+                        $('#warningModal').on('hidden.bs.modal', function () {
+                            window.location.reload();
+                        });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    let errorMessage = xhr.responseJSON ? xhr.responseJSON.msg : 'Terjadi kesalahan';
+                    $('#modalMessageE').text(errorMessage);
+                    $("#errorModal").modal("show");
+                }
+            });
+          }
 </script>
 
 
@@ -312,18 +349,25 @@
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>no</th>
+                                        <th>Foto</th>
                                         <th>nama</th>
                                         <th>username</th>
                                         <th>Email</th>
                                         <th>Nomor</th>
+                                        <th>Role</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for dt in data %}
                                         <tr>
-                                            <td class="col-1">{{ loop.index }}</td>
+                                            <td class="col-1">
+                                                {% if dt.foto_profil %}
+                                                <img class="img-fluid rounded-circle " src="{{ url_for('static', filename='img/profile/' + dt.foto_profil) }}">
+                                                {% else %}
+                                                <img class="img-fluid rounded-circle " src="{{ url_for('static', filename='img/undraw_profile.svg') }}">
+                                                {% endif %}
+                                            </td>
                                             <td class="col-2">{{ dt.name }}</td>
                                             <td class="col-2">{{ dt.username }}</td>
                                             <td>{{ dt.email }}</td>
@@ -334,7 +378,29 @@
                                                     <option value="2" {% if dt.role == '2' %}selected{% endif %}>User</option>
                                                 </select>
                                             </td>
+                                            <td>
+                                                <a href="#" class="btn btn-danger mb-1" title="Hapus User" data-toggle="modal" data-target="#hapusModal{{ dt._id }}"><i class="fas fa-fw fa-trash"></i> </a>
+                                            </td>
                                         </tr>
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="hapusModal{{ dt._id }}" tabindex="-1" aria-labelledby="responseModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                              <div class="modal-content">
+                                                <div class="modal-body row">
+                                                    <div class="col-12 d-flex justify-content-center">
+                                                        <dotlottie-player src="https://lottie.host/d280ef46-6a47-403b-b396-807cf4579b95/fEmrI0fi9R.json" background="transparent" speed="1" style="width: 200px; height: 200px" direction="1" playMode="normal" loop autoplay></dotlottie-player>
+                                                    </div>
+                                                    <div class="col text-center">
+                                                        <p id="modalMessageE">Apakah anda yakin ingin hapus User {{ dt.name }} ini?</p>
+                                                        <button type="submit" class="btn btn-danger" onclick="hapus_user('{{ dt._id }}')" data-dismiss="modal">
+                                                            Hapus
+                                                        </button>
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                        </div>
                                     {% endfor %}
                                 </tbody>
                             </table>
