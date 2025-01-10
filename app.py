@@ -477,6 +477,7 @@ def dashboard():
             data = users,
             data_count = total,
             time = today.strftime('%d %B %Y'),
+            profile = profile_collection.find_one(),
             pagination=pagination
             )
     elif 'username' in session and session.get('role') == '2':
@@ -664,6 +665,7 @@ def profilePerusahaan():
             user = users_collection.find_one({"_id": ObjectId(session['id'])}),
             time = today.strftime('%d %B %Y'),
             data = profile_collection.find_one(),
+            profile = profile_collection.find_one(),
             )
     elif 'username' in session and session.get('role') == '2':
         return redirect(url_for('home'))
@@ -778,6 +780,7 @@ def dataContact():
             user = users_collection.find_one({"_id": ObjectId(session['id'])}),
             time = today.strftime('%d %B %Y'),
             data = contact_collection.find_one(),
+            profile = profile_collection.find_one(),
             )
     elif 'username' in session and session.get('role') == '2':
         return redirect(url_for('home'))
@@ -907,6 +910,7 @@ def dataLayanan():
             user = users_collection.find_one({"_id": ObjectId(session['id'])}),
             time = today.strftime('%d %B %Y'),
             data = layanans,
+            profile = profile_collection.find_one(),
             data_count = layanan_collection.count_documents({}),
             pagination=pagination
             )
@@ -997,23 +1001,33 @@ def hapus_layanan():
 
 @app.route('/dataLayanan/searchLayanan', methods=['GET'])
 def search_layanan():
+    today = datetime.now()
+    page = request.args.get('page', 1, type=int)  
+    per_page = 5  
+    
     query = request.args.get('query', '') 
     if query:  
-        results = layanan_collection.find({
+        total = layanan_collection.count_documents({
             "judul": {"$regex": query, "$options": "i"}
         })
-        results = list(results)  
+        results = layanan_collection.find({
+            "judul": {"$regex": query, "$options": "i"}
+        }).sort('_id', -1).skip((page - 1) * per_page).limit(per_page)
     else:
-        results = layanan_collection.find()
+        total = layanan_collection.count_documents({})
+        results = layanan_collection.find().sort('_id', -1).skip((page - 1) * per_page).limit(per_page)
 
-    today = datetime.now()
+    results = list(results)  
+    pagination = Pagination(page=page, per_page=per_page, total=total, record_name='promos')
     return render_template(
         'dataLayanan.html', 
             title = "Data Layanan",
             user = users_collection.find_one({"username": session['username']}),
             time = today.strftime('%d %B %Y'),
             data=results, 
-            data_count = layanan_collection.count_documents({}), 
+            profile = profile_collection.find_one(),
+            data_count = total, 
+            pagination=pagination,
             query=query)
 # ========================= End Data Layanan ========================
 
@@ -1073,6 +1087,7 @@ def dataPromo():
             user = users_collection.find_one({"_id": ObjectId(session['id'])}),
             time = today.strftime('%d %B %Y'),
             data = promos,
+            profile = profile_collection.find_one(),
             data_count = promo_collection.count_documents({}),
             pagination=pagination
             )
@@ -1156,23 +1171,33 @@ def hapus_promo():
 
 @app.route('/dataPromo/searchPromo', methods=['GET'])
 def search_promo():
+    today = datetime.now()
+    page = request.args.get('page', 1, type=int)  
+    per_page = 5  
     query = request.args.get('query', '') 
     if query:  
-        results = promo_collection.find({
+        total = promo_collection.count_documents({
             "judul": {"$regex": query, "$options": "i"}
         })
-        results = list(results)  
+        results = promo_collection.find({
+            "judul": {"$regex": query, "$options": "i"}
+        }).sort('_id', -1).skip((page - 1) * per_page).limit(per_page)
     else:
-        results = promo_collection.find()
+        total = promo_collection.count_documents({})
+        results = promo_collection.find().sort('_id', -1).skip((page - 1) * per_page).limit(per_page)
 
-    today = datetime.now()
+    results = list(results)  
+    pagination = Pagination(page=page, per_page=per_page, total=total, record_name='promos')
+
     return render_template(
         'dataPromo.html', 
             title = "Data Promo",
             user = users_collection.find_one({"username": session['username']}),
             time = today.strftime('%d %B %Y'),
             data=results, 
-            data_count = promo_collection.count_documents({}), 
+            profile = profile_collection.find_one(),
+            data_count = total, 
+            pagination=pagination,
             query=query)
 # ========================= End Data Promo ========================
 
